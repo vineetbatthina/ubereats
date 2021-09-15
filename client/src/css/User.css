@@ -1,0 +1,47 @@
+.center-div{
+    margin : 8% 0% 0% 35%;
+    width: 800px;
+}
+
+.forms{
+    font-size: 150%;
+}
+
+.forms input {
+    margin: 2% 0 2% 0;
+    width: 50%;
+    height: 10%;
+    font-size: 16pt;
+    border-radius: 10px;
+}
+
+.forms button {
+    background-color: black;
+    color: white;
+}
+
+#signin_form , #signup_form{
+    position: relative;
+    margin-top: 10%;
+}
+
+#login_btn , #signup_btn{
+    width: 51%;
+    margin-top:1%;
+    border-radius: 10px;
+}
+
+button {
+    background-color: inherit;
+    border: 1px solid;
+    padding: 5pt;
+    text-align: center;
+    display: inline-block;
+    cursor: pointer;
+    font-size: 100%;
+    border-radius: 10px;
+}
+
+input:focus { 
+    outline: none !important;
+}

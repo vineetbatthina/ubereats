@@ -12,7 +12,7 @@ export async function createUser(user) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user)
     };
-
+    console.log("Client Side User Sent:"+ user);
     try {
         const fetchResponse = await fetch('http://localhost:3080/api/createUser', requestOptions);
         const data = await fetchResponse.json();

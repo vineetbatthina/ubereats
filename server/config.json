@@ -1,0 +1,11 @@
+{
+    "DB" : {
+        "host" : "ubereatsdb.cpkvsc9jyf5q.us-east-2.rds.amazonaws.com",
+        "username" : "admin",
+        "password" : "ubereatsdb",
+        "port": 3306,
+        "database" : "ubereats"
+    },
+    "secret":"",
+    "client":"http://localhost:3000"
+}

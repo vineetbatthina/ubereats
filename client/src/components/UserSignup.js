@@ -20,15 +20,26 @@ export default class UserSignup extends Component {
         this.props.setPageRedirect('');
     }
 
-    storeUser(event) {
-
+    async storeUser (event) {
+        event.preventDefault();
         const user = {
             userEmail: this.state.emailId,
             userName : this.state.userName,
-            password: this.state.password
+            password: this.state.password,
+            restaurantOwner: 'N'
         }
-        createUser(user);
-        event.preventDefault();
+        const return_code = await createUser(user);
+        if(return_code===301){
+            alert('Email Id already exists Please Login');
+            window.location.href="/userLogin";
+        }
+        else if(return_code===200){
+            console.log('User Signed Up');
+            window.location.href="/userLogin";
+        }
+        else {
+            alert('Error signing up user. Please try again later');
+        }
     }
 
     render() {

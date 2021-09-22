@@ -15,9 +15,15 @@ export async function createUser(user) {
     console.log("Client Side User Sent:"+ user);
     try {
         const fetchResponse = await fetch('http://localhost:3080/api/createUser', requestOptions);
-        const data = await fetchResponse.json();
-        return data;
+        const data = await fetchResponse;
+        if(data.status === 200 || data.status === 301){
+            return data.status;
+        }
+        else{
+            return 0;
+        }
     } catch (e) {
-        return e;
+        console.log(e);
+        return -1;
     }  
 }

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import '../css/Restaurant.css';
 import { createRestaurant } from '../services/RestaurantService';
+import { createUser } from '../services/UserService';
 
 export default class RestaurantLoginLandingPage extends Component {
 
@@ -10,7 +11,7 @@ export default class RestaurantLoginLandingPage extends Component {
         this.state ={
             storeName : '',
             storeLocation: '',
-            fullName : '',
+            ownerName : '',
             emailId : '',
             pwd : '',
             rePwd : ''
@@ -19,16 +20,39 @@ export default class RestaurantLoginLandingPage extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleSubmit(event){
+    async handleSubmit(event){
+        event.preventDefault();
+        const user = {
+            userEmail: this.state.emailId,
+            userName : this.state.ownerName,
+            password: this.state.pwd,
+            restaurantOwner: 'Y'
+        }
         const restuarant = {
             storeName: this.state.storeName,
             storeLocation : this.state.storeLocation,
-            fullName: this.state.fullName,
-            emailId: this.state.emailId,
-            pwd: this.state.pwd
+            ownerName: this.state.ownerName,
         }
-        createRestaurant(restuarant);
-        event.preventDefault();
+        const user_return_code = await createUser(user);
+        if(user_return_code===301){
+            alert('Email Id already exists Please Login');
+        }
+        else if(user_return_code===200){
+            console.log('User Table Filled');
+        }
+        else {
+            alert('Error signing up Restaurant. Please try again later');
+        }
+        const return_code = await createRestaurant(restuarant);
+        if(return_code===310){
+            alert('Store Name already exists Please Login');
+        }
+        else if(return_code===200){
+            console.log('Restaurant Table Filled');
+        }
+        else {
+            alert('Error signing up Restaurant. Please try again later');
+        }
         window.location.href="/";
     }
 
@@ -53,15 +77,15 @@ export default class RestaurantLoginLandingPage extends Component {
                     </div>
                 </header>
                 <div>
-                    <form className="signup_form">
+                    <form className="signup_form" onSubmit={this.handleSubmit}>
                         <p id="get_started">Get Started</p>
                         <input placeholder="Store Name" className="res_signup_inputs" value={this.state.storeName} onChange={(e) => this.setState({ storeName: e.target.value })} required></input>
                         <input placeholder="Store Location" className="res_signup_inputs" value={this.state.storeLocation} onChange={(e) => this.setState({ storeLocation: e.target.value })} required></input>
-                        <input placeholder="Your Full Name" className="res_signup_inputs" value={this.state.fullName} onChange={(e) => this.setState({ fullName: e.target.value })} required></input>
+                        <input placeholder="User Name" className="res_signup_inputs" value={this.state.ownerName} onChange={(e) => this.setState({ ownerName: e.target.value })} required></input>
                         <input placeholder="Email" type="email" className="res_signup_inputs" value={this.state.emailId} onChange={(e) => this.setState({ emailId: e.target.value })} required></input>
                         <input placeholder="Password" type="password" className="res_signup_inputs" value={this.state.pwd} onChange={(e) => this.setState({ pwd: e.target.value })} required></input>
                         <input placeholder="Re Enter Password" type="password" className="res_signup_inputs" value={this.state.rePwd} onChange={(e) => this.setState({ rePwd: e.target.value })} required></input>
-                        <button className="res_signup_submit" onClick={this.handleSubmit}> Submit</button>
+                        <button type="submit" className="res_signup_submit"> Submit</button>
                     </form>
                 </div>
             </div>

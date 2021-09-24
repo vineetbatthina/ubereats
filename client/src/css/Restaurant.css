@@ -93,3 +93,8 @@
       height: 8%;
       margin: 5% 0 0.5% 5%;
   }
+
+  #menu{
+      background-color: red;
+      height : 100%
+  }

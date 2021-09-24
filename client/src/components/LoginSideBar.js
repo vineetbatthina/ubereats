@@ -25,7 +25,7 @@ export default class LoginSideBar extends Component {
                     </button>
                     <a href='/restaurant'>Add your Restaurant</a>
                 </div>
-                <div class="blur" onClick={this.displayLandingPage}>
+                <div className="blur" onClick={this.displayLandingPage}>
                 </div>
             </div>
         );

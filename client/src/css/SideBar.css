@@ -18,7 +18,7 @@
     position: absolute;
 }
 
-.signin_btn{
+.signin_btn, .logut_btn{
     background-color: black;
     color: white;
     width: 75%;
@@ -35,4 +35,13 @@
 .sideBar a:hover{
     text-decoration: none;
     color: rgba(0, 0, 0, 0.459);
+}
+
+.res_sidebar_btns{
+    border-radius: 10px;
+    background-color: black;
+    color: white;
+    width: 75%;
+    height: 7%;
+    margin: 5% 5% 0 12%;
 }

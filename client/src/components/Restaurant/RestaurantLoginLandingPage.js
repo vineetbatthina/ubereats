@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import '../css/Restaurant.css';
-import { createRestaurant } from '../services/RestaurantService';
-import { createUser } from '../services/UserService';
+import '../../css/Restaurant.css';
+import { createRestaurant } from '../../services/RestaurantService';
+import { createUser } from '../../services/UserService';
 
 export default class RestaurantLoginLandingPage extends Component {
 
@@ -22,6 +22,10 @@ export default class RestaurantLoginLandingPage extends Component {
 
     async handleSubmit(event){
         event.preventDefault();
+        if(this.state.pwd !== this.state.rePwd){
+            alert("Passwords Don't Match");
+            return 0;
+        }
         const user = {
             userEmail: this.state.emailId,
             userName : this.state.ownerName,
@@ -34,26 +38,17 @@ export default class RestaurantLoginLandingPage extends Component {
             ownerName: this.state.ownerName,
         }
         const user_return_code = await createUser(user);
-        if(user_return_code===301){
-            alert('Email Id already exists Please Login');
-        }
-        else if(user_return_code===200){
-            console.log('User Table Filled');
-        }
-        else {
-            alert('Error signing up Restaurant. Please try again later');
-        }
         const return_code = await createRestaurant(restuarant);
-        if(return_code===310){
-            alert('Store Name already exists Please Login');
+        if(user_return_code===301){
+            alert('User Name / Email is already registered. Please signup with New Credentials');
         }
-        else if(return_code===200){
-            console.log('Restaurant Table Filled');
+        else if(user_return_code===200 && return_code===200){
+            alert('Sign up Successfull');
+            window.location.href = "/";
         }
         else {
-            alert('Error signing up Restaurant. Please try again later');
+            document.getElementById('error_div').innerHTML = 'Error signing up Restaurant. Please try again later';
         }
-        window.location.href="/";
     }
 
     render() {

@@ -22,6 +22,10 @@ export default class UserSignup extends Component {
 
     async storeUser (event) {
         event.preventDefault();
+        if(this.state.password !== this.state.reEnterPassword){
+            alert("Passwords Not Matching");
+            return ;
+        }
         const user = {
             userEmail: this.state.emailId,
             userName : this.state.userName,
@@ -30,8 +34,7 @@ export default class UserSignup extends Component {
         }
         const return_code = await createUser(user);
         if(return_code===301){
-            alert('Email Id already exists Please Login');
-            window.location.href="/userLogin";
+            alert('Email Id already exists');
         }
         else if(return_code===200){
             console.log('User Signed Up');

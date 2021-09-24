@@ -20,7 +20,7 @@
     height: 75%;
 }
 
-#signin_btn{
+#signin_btn, #logout_btn{
     border-radius: 10%;
     margin-right: 1%;
     margin-top: 1%;

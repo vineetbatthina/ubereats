@@ -7,7 +7,7 @@ export default class Orders extends Component {
                 <br />
                 <br />
                 <br />
-                <table class="table">
+                <table className="table">
                     <thead>
                         <tr>
                             <th scope="col">Order Id</th>

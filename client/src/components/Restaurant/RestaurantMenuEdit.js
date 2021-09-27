@@ -6,19 +6,19 @@ export default class RestaurantMenuEdit extends Component {
             <div className="container">
                 <div className="row">
                     <div className="col-3">
-                        Dish Images<input type="file" class="form-control-file" id="exampleFormControlFile1" placeholder="Dish Image Upload"></input>
+                        Dish Images<input type="file" className="form-control-file" id="exampleFormControlFile1" placeholder="Dish Image Upload"></input>
                     </div>
                     <div className="col">
-                        <input type="text" class="form-control" placeholder="Dish Description"></input>
+                        <input type="text" className="form-control" placeholder="Dish Description"></input>
                     </div>
                     <div className="col">
-                        <input type="text" class="form-control" placeholder="Dish Price"></input>
+                        <input type="text" className="form-control" placeholder="Dish Price"></input>
                     </div>
                     <div className="col">
-                        <input type="text" class="form-control" placeholder="Dish Ingredients"></input>
+                        <input type="text" className="form-control" placeholder="Dish Ingredients"></input>
                     </div>
                     <div className="col">
-                        <input type="text" class="form-control" placeholder="Dish Category"></input>
+                        <input type="text" className="form-control" placeholder="Dish Category"></input>
                     </div>
                     <div className="col">
                         <button className="btn btn-dark">Add Item</button>

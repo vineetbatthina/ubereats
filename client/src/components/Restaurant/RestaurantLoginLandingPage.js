@@ -35,7 +35,7 @@ export default class RestaurantLoginLandingPage extends Component {
         const restuarant = {
             storeName: this.state.storeName,
             storeLocation : this.state.storeLocation,
-            ownerName: this.state.ownerName,
+            ownerEmail: this.state.emailId,
         }
         const user_return_code = await createUser(user);
         const return_code = await createRestaurant(restuarant);

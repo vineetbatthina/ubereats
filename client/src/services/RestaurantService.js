@@ -48,3 +48,19 @@ export async function getRestaurantProfile(request) {
         return -1;
     }
 }
+
+export async function saveRestaurantProfile(restaurantProfile) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(restaurantProfile)
+    };
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/saveRestaurantProfile', requestOptions);
+        return fetchResponse.status;
+    } catch (e) {
+        console.log(e);
+        return -1;
+    }
+}

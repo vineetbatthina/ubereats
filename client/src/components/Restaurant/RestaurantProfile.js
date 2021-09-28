@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import '../../css/Generic.css';
-import { getRestaurantProfile } from '../../services/RestaurantService';
+import { getRestaurantProfile, saveRestaurantProfile } from '../../services/RestaurantService';
 
 export default class RestaurantProfile extends Component {
 
@@ -13,12 +13,34 @@ export default class RestaurantProfile extends Component {
             description: '',
             timings: '',
             emailId: '',
-            contactInformation: ''
+            phone: '',
+            saveMessege: true
         }
+
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         event.preventDefault();
+        const restaurantProfile = {
+            restaurantName: this.state.restaurantName,
+            location: this.state.location,
+            description: this.state.description,
+            timings: this.state.timings,
+            emailId: this.state.emailId,
+            phone: this.state.phone
+        };
+        const response = await saveRestaurantProfile(restaurantProfile);
+        if(response===200){
+            this.setState({
+                saveMessege : false
+            })
+            document.getElementById('save_messege').innerHTML = "Successfully Saved your Profile !!!";
+        }
+        else{
+
+        }
+        
     }
 
     async componentDidMount() {
@@ -39,7 +61,7 @@ export default class RestaurantProfile extends Component {
                 restaurantName: restaurantProfile.store_name,
                 location: restaurantProfile.store_location,
                 description: (restaurantProfile.description) ? restaurantProfile.description : '',
-                timings: (restaurantProfile.timings) ? restaurantProfile.descriptitimingson : '',
+                timings: (restaurantProfile.timings) ? restaurantProfile.timings : '',
                 emailId: localStorage.getItem('emailId'),
                 phone: (restaurantProfile.phone) ? restaurantProfile.phone : ''
             })
@@ -70,7 +92,7 @@ export default class RestaurantProfile extends Component {
                         <label htmlFor="formGroupExampleInput2">Contact Information</label>
                         <div className="row">
                             <div className="col">
-                                <input type="text" className="form-control" value = {this.state.emailId} onChange={(e) => this.setState({ emailId: e.target.value })}/>
+                                <input type="text" className="form-control" value = {localStorage.getItem('emailId')} readOnly/>
                             </div>
                             <div className="col">
                                 <input type="text" className="form-control" placeholder="Phone Number" value = {this.state.phone} onChange={(e) => this.setState({ phone: e.target.value })}/>
@@ -81,6 +103,11 @@ export default class RestaurantProfile extends Component {
                     <div className="row">
                         <div className="col-1">
                             <button type="submit" className="btn btn-dark" onClick={this.handleSubmit}>Save</button>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col">
+                            <div id="save_messege" hidden={this.state.saveMessege} style={{marginTop : '1%'}}></div>
                         </div>
                     </div>
                 </form>

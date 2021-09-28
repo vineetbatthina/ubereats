@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import '../css/User.css';
 import { createUser } from '../services/UserService';
+import { connect } from "react-redux";
+import { addCustomerUser } from "../_actions/index";
 
-export default class UserSignup extends Component {
+class UserSignup extends Component {
 
     constructor(props) {
         super(props);
@@ -20,29 +22,30 @@ export default class UserSignup extends Component {
         this.props.setPageRedirect('');
     }
 
-    async storeUser (event) {
+    storeUser (event) {
         event.preventDefault();
         if(this.state.password !== this.state.reEnterPassword){
             alert("Passwords Not Matching");
             return ;
         }
-        const user = {
+        const customerUser = {
             userEmail: this.state.emailId,
             userName : this.state.userName,
             password: this.state.password,
             restaurantOwner: 'N'
         }
-        const return_code = await createUser(user);
-        if(return_code===301){
-            alert('Email Id already exists');
-        }
-        else if(return_code===200){
-            console.log('User Signed Up');
-            window.location.href="/userLogin";
-        }
-        else {
-            alert('Error signing up user. Please try again later');
-        }
+        this.props.addCustomerUser(customerUser);
+        // const return_code = await createUser(user);
+        // if(return_code===301){
+        //     alert('Email Id already exists');
+        // }
+        // else if(return_code===200){
+        //     console.log('User Signed Up');
+        //     window.location.href="/userLogin";
+        // }
+        // else {
+        //     alert('Error signing up user. Please try again later');
+        // }
     }
 
     render() {
@@ -57,7 +60,7 @@ export default class UserSignup extends Component {
                     <input type="password" value={this.state.password} onChange={(e) => this.setState({ password: e.target.value })} required></input><br />
                     Re Enter Password:<br />
                     <input type="password" value={this.state.reEnterPassword} onChange={(e) => this.setState({ reEnterPassword: e.target.value })} required></input><br />
-                    <button type="submit" id="signup_btn" onSubmit={this.storeUser}>Sign Up</button>
+                    <button type="submit" id="signup_btn">Sign Up</button>
                 </form>
                 <button id="signup_btn" onClick={this.setPageProp}>Already have an account ? Log in </button>
             </div>
@@ -65,3 +68,11 @@ export default class UserSignup extends Component {
         );
     }
 }
+
+function mapDispatchToProps (dispatch) {
+    return {
+      addCustomerUser : customerUser => dispatch(addCustomerUser(customerUser))
+    }
+  }
+
+  export default connect(null , mapDispatchToProps)(UserSignup);

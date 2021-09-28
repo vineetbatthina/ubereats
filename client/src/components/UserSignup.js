@@ -35,17 +35,21 @@ class UserSignup extends Component {
             restaurantOwner: 'N'
         }
         this.props.addCustomerUser(customerUser);
-        // const return_code = await createUser(user);
-        // if(return_code===301){
-        //     alert('Email Id already exists');
-        // }
-        // else if(return_code===200){
-        //     console.log('User Signed Up');
-        //     window.location.href="/userLogin";
-        // }
-        // else {
-        //     alert('Error signing up user. Please try again later');
-        // }
+    }
+
+    componentDidUpdate(prevProps){
+        if(this.props.signupStatus !== prevProps.signupStatus){
+            if(this.props.signupStatus==="SUCCESS"){
+                alert('Signp is successfull. Please Login');
+                window.location.href="/userLogin";
+            }
+            else if(this.props.signupStatus==="DUP"){
+                alert('Email Id / User Id exists. Please Retry');
+            }
+            else if(this.props.signupStatus==="ERR"){
+                alert('Please contact administrator');
+            }
+        }
     }
 
     render() {
@@ -75,4 +79,8 @@ function mapDispatchToProps (dispatch) {
     }
   }
 
-  export default connect(null , mapDispatchToProps)(UserSignup);
+const mapStateToProps = state => {
+    return { signupStatus: state.userReducer.signupStatus };
+};
+
+  export default connect(mapStateToProps , mapDispatchToProps)(UserSignup);

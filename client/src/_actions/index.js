@@ -15,10 +15,16 @@ export const addCustomerUser = (payload) => {
         }
         else if(return_code===301){
             console.log('Email Already Exists');
-            window.location.href="/userLogin";
+            dispatch({
+                type: ActionTypes.MULTIPLE_USERS,
+                payload
+            })
         }
         else {
-            
+            dispatch({
+                type: ActionTypes.USER_ADD_FAILED,
+                payload
+            })
         }
     }
 

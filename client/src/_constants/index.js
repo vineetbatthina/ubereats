@@ -1,4 +1,6 @@
 export const ActionTypes = {
     ADD_CUSTOMER_USER: 'ADD_CUSTOMER_USER',
+    MULTIPLE_USERS: 'MULTIPLE_USERS',
+    USER_ADD_FAILED: 'USER_ADD_FAILED'
 }
   

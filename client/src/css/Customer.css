@@ -1,0 +1,22 @@
+.customer_location_input{
+    width: 25%;
+    height: 50%;
+    border-radius: 25px;
+    border-style: none;
+    background-color: #EEEEEE;
+    padding-left: 1%;
+}
+
+.food_input{
+    width: 25%;
+    height: 75%;
+    background-color: #EEEEEE;
+    border-style: none;
+    padding-left: 1%;
+}
+
+#cart{
+    background-color: black;
+    color: white;
+    border-radius: 10px;
+}

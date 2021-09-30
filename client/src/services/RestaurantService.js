@@ -64,3 +64,39 @@ export async function saveRestaurantProfile(restaurantProfile) {
         return -1;
     }
 }
+
+export async function saveDish(dish) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dish)
+    };
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/saveDish', requestOptions);
+        return fetchResponse.status;
+    } catch (e) {
+        console.log(e);
+        return -1;
+    }
+}
+
+export async function getDishes(emailId) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(emailId)
+    };
+    let dishes = null;
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/getDishes', requestOptions);
+        const data = await fetchResponse.json();
+        if(fetchResponse.status===200){
+            dishes = data;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+    return dishes;
+}

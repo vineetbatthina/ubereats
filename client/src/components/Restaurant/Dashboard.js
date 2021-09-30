@@ -78,7 +78,9 @@ export default class Dashboard extends Component {
     }
 
     handleLogout(){
-        localStorage.clear();
+        localStorage.setItem('isLoggedIn',false);
+        localStorage.setItem('isRestaurantOwner','');
+        localStorage.setItem('emailId','');
         window.location.href="/";
     }
 

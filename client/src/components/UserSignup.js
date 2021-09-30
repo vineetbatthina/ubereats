@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import '../css/User.css';
-import { createUser } from '../services/UserService';
 import { connect } from "react-redux";
+import { Redirect } from 'react-router';
 import { addCustomerUser } from "../_actions/index";
 
 class UserSignup extends Component {
@@ -37,24 +37,22 @@ class UserSignup extends Component {
         this.props.addCustomerUser(customerUser);
     }
 
-    componentDidUpdate(prevProps){
-        if(this.props.signupStatus !== prevProps.signupStatus){
-            if(this.props.signupStatus==="SUCCESS"){
-                alert('Signp is successfull. Please Login');
-                window.location.href="/userLogin";
-            }
-            else if(this.props.signupStatus==="DUP"){
-                alert('Email Id / User Id exists. Please Retry');
-            }
-            else if(this.props.signupStatus==="ERR"){
-                alert('Please contact administrator');
-            }
-        }
-    }
-
     render() {
+        let redirectComponent = null;
+        if(this.props.signupStatus==="SUCCESS"){
+            alert('Signp is successfull. Please Login');
+            redirectComponent = <Redirect to="/" />
+        }
+        else if(this.props.signupStatus==="DUP"){
+            alert('Email Id / User Id exists. Please Retry');
+        }
+        else if(this.props.signupStatus==="ERR"){
+            alert('Please contact administrator');
+        }
+
         return (
             <div>
+                {redirectComponent}
                 <form className="forms" id="signup_form" onSubmit={this.storeUser}>
                     Email Id:<br />
                     <input type="email" value={this.state.emailId} onChange={(e) => this.setState({ emailId: e.target.value })} required></input><br />
@@ -73,14 +71,16 @@ class UserSignup extends Component {
     }
 }
 
-function mapDispatchToProps (dispatch) {
+const mapDispatchToProps = (dispatch) =>{
     return {
       addCustomerUser : customerUser => dispatch(addCustomerUser(customerUser))
     }
   }
 
 const mapStateToProps = state => {
-    return { signupStatus: state.userReducer.signupStatus };
+    return { 
+        signupStatus: state.userReducer.signupStatus,
+     };
 };
 
   export default connect(mapStateToProps , mapDispatchToProps)(UserSignup);

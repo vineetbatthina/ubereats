@@ -5,9 +5,9 @@ const PublicRoute = ({component: Component, ...rest}) => {
     return (
         // restricted = false meaning public route
         <Route {...rest} render={props => (
-            localStorage.getItem('res') ?
+            (localStorage.getItem('isLoggedIn') && localStorage.getItem('isRestaurantOwner')==='Y') ?
                 <Redirect to="/dashboard" />
-            : localStorage.getItem('cust') ? <Redirect to="/custdashboard" /> : <Component {...props} />
+            : (localStorage.getItem('isLoggedIn') && localStorage.getItem('isRestaurantOwner')==='N') ? <Redirect to="/custdashboard" /> : <Component {...props} />
         )} />
     );
 };

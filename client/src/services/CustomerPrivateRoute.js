@@ -5,7 +5,7 @@ const CustomerPrivateRoute = ({component: Component, ...rest}) => {
     return (
 
         <Route {...rest} render={props => (
-            localStorage.getItem('cust') ?
+            (localStorage.getItem('isLoggedIn') && localStorage.getItem('isRestaurantOwner')==='N')?
                 <Component {...props} />
             : localStorage.getItem('res') ? <Redirect to="/dashboard" /> : <Redirect to="/" />
         )} />

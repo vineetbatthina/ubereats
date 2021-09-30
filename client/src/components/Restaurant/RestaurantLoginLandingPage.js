@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import '../../css/Restaurant.css';
-import { createRestaurant } from '../../services/RestaurantService';
-import { createUser } from '../../services/UserService';
+import { addRestaurant } from '../../_actions/index';
+import { addCustomerUser } from '../../_actions/index';
+import {connect} from 'react-redux';
+import {Redirect} from 'react-router';
 
-export default class RestaurantLoginLandingPage extends Component {
+class RestaurantLoginLandingPage extends Component {
 
     constructor(props){
         super(props);
@@ -20,13 +22,13 @@ export default class RestaurantLoginLandingPage extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    async handleSubmit(event){
+    handleSubmit(event){
         event.preventDefault();
         if(this.state.pwd !== this.state.rePwd){
             alert("Passwords Don't Match");
             return 0;
         }
-        const user = {
+        const restaurantUser = {
             userEmail: this.state.emailId,
             userName : this.state.ownerName,
             password: this.state.pwd,
@@ -37,23 +39,26 @@ export default class RestaurantLoginLandingPage extends Component {
             storeLocation : this.state.storeLocation,
             ownerEmail: this.state.emailId,
         }
-        const user_return_code = await createUser(user);
-        const return_code = await createRestaurant(restuarant);
-        if(user_return_code===301){
-            alert('User Name / Email is already registered. Please signup with New Credentials');
-        }
-        else if(user_return_code===200 && return_code===200){
-            alert('Sign up Successfull');
-            window.location.href = "/";
-        }
-        else {
-            document.getElementById('error_div').innerHTML = 'Error signing up Restaurant. Please try again later';
-        }
+
+        this.props.addCustomerUser(restaurantUser);
+        this.props.addRestaurant(restuarant);
     }
 
     render() {
+        let redirectComponent = null;
+        if (this.props.userAdditionStatus === "SUCCESS" && this.props.restaurantAdditionStatus === "SUCCESS" ) {
+            alert("Signup is successful");
+            redirectComponent = <Redirect to="/" />
+        }
+        else if(this.props.userAdditionStatus==="DUP" || this.props.restaurantAdditionStatus==="DUP"){
+            alert('Email Id / User Id exists. Please Retry');
+        }
+        else if(this.props.userAdditionStatus==="ERR" || this.props.restaurantAdditionStatus==="ERR"){
+            alert('Please contact administrator');
+        }
         return (
             <div className="restaurant_landingpage">
+                {redirectComponent}
                 <header className="restaurant_header">
                     <div className="uber_eats">
                         <span id="uber">Uber</span> <span id="eats">Eats</span> <span id="for_res">for Restaurants</span>
@@ -87,3 +92,19 @@ export default class RestaurantLoginLandingPage extends Component {
         );
     }
 }
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        addCustomerUser : restaurantUser => dispatch(addCustomerUser(restaurantUser)),
+        addRestaurant : restuarant => dispatch(addRestaurant(restuarant))   
+     }
+}
+
+const mapStateToProps = state => {
+    return {
+        userAdditionStatus : state.userReducer.signupStatus,
+        restaurantAdditionStatus : state.restaurantReducer.signupStatus
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(RestaurantLoginLandingPage);

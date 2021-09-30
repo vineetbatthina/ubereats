@@ -7,6 +7,8 @@ Cors = require("cors"),
 app.use(bodyParser.json());
 app.use(Cors());
 
+const customer_router = require('./routes/customer');
+app.use(customer_router);
 
 const users_router = require('./routes/users');
 app.use(users_router);

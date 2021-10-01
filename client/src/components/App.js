@@ -8,6 +8,7 @@ import UserLoginLandingPage from './UserLoginLandingPage';
 import RestaurantPrivateRoute from '../services/RestaurantPrivateRoute';
 import CustomerPrivateRoute from '../services/CustomerPrivateRoute';
 import PublicRoute from '../services/PublicRoute';
+import RestaurantDisplay from './Common/RestaurantDisplay';
 
 class App extends React.Component {
   render() {
@@ -19,6 +20,7 @@ class App extends React.Component {
           <PublicRoute exact path='/' component={LandingPage} />
           <RestaurantPrivateRoute exact path='/dashboard' component={Dashboard} />
           <CustomerPrivateRoute exact path='/custdashboard' component={CustomerDashboard} />
+          <CustomerPrivateRoute exact path='/restaurantDisplay' component={RestaurantDisplay} />
         </Switch>
       </Router>
     );

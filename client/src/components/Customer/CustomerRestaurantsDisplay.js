@@ -11,13 +11,16 @@ export default class CustomerRestaurantsDisplay extends Component {
         this.state = {
             restaurants: []
         }
+
     }
 
     async componentDidMount() {
         const restaurants = await getAllRestaurants();
         if (restaurants) {
             this.setState({
-                restaurants: restaurants
+                restaurants: restaurants,
+                showRestaurant : false,
+                restaurantIdSelected : ''
             })
         }
     }
@@ -33,8 +36,6 @@ export default class CustomerRestaurantsDisplay extends Component {
         return null;
     }
 
-    displayRestaurant
-
     render() {
         return (
             <div id="customer_restaurants">
@@ -46,8 +47,8 @@ export default class CustomerRestaurantsDisplay extends Component {
                     {
                         this.state.restaurants.map((restaurant) => {
                            return (
-                               <div className="col">
-                                   <RestaurantCard restaurantName={restaurant.store_name} restuarantDescription={restaurant.description} restaurantId = {this.props.restaurant_id}/>
+                               <div className="col" key={restaurant.restaurant_id}>
+                                   <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantId = {restaurant.restaurant_id}/>
                                 </div>
                            )
                         })

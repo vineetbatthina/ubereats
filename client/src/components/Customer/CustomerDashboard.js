@@ -12,12 +12,18 @@ export default class CustomerDashboard extends Component {
         }
 
         this.searchByLocation = this.searchByLocation.bind(this);
+        this.displayRestaurantDetail = this.displayRestaurantDetail.bind(this);
     }
 
     searchByLocation(enteredLocation){
         this.setState({
-            location : enteredLocation
+            location : enteredLocation,
+            showRestaurant : false
         })
+    }
+
+    displayRestaurantDetail(restaurantId){
+        console.log(restaurantId);
     }
 
     render() {
@@ -30,7 +36,7 @@ export default class CustomerDashboard extends Component {
 
                     </div>
                     <div className="col-9">
-                        <CustomerRestaurantsDisplay location={this.state.location}/>
+                        <CustomerRestaurantsDisplay location={this.state.location} displayRestaurantDetail={this.displayRestaurantDetail}/>
                     </div>
                 </div>
             </div>

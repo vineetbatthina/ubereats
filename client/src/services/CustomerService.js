@@ -27,3 +27,23 @@ export async function getLocalRestaurants(locationJson) {
         return -1;
     }  
 }
+
+export async function getDishesbyResId(restaurantId) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(restaurantId)
+    };
+    let dishes = null;
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/getDishesbyResId', requestOptions);
+        const data = await fetchResponse.json();
+        if(fetchResponse.status===200){
+            dishes = data;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+    return dishes;
+}

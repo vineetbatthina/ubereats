@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
 import '../../css/Customer.css';
 import { getDishesbyResId } from '../../services/CustomerService';
-import Dish from './Dish';
+import DishCustomer from '../Customer/DishCustomer';
 import CustomerNavBar from '../Customer/CustomerNavBar';
+import 'reactjs-popup/dist/index.css';
 
 export default class RestaurantDisplay extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            dishes: []
+            dishes: [],
+            error_pop: false
         };
+
     }
 
     async componentDidMount() {
@@ -29,10 +32,18 @@ export default class RestaurantDisplay extends Component {
     }
 
     render() {
+
+        if (!this.props.location.state) {
+            window.location.href = "/custdashboard";
+        }
+
         return (
-            <div>
+            <div style={{marginLeft:'2%'}}>
                 < CustomerNavBar searchByLocation={this.searchByLocation} />
                 <div className="row">
+                    <div className="col-5">
+
+                    </div>
                     <div className="col">
                         <h2>{this.props.location.state.restaurantName} </h2>
                     </div>
@@ -43,22 +54,13 @@ export default class RestaurantDisplay extends Component {
                     </div>
                 </div>
                 <br />
-                <div className="row">
+                <div className="row" >
                     {
                         this.state.dishes.map((dish) => {
                             return (
                                 <div className="col-3" key={dish.dish_id} style={{ marginBottom: '1%' }}>
-                                    <div className="row" style={{ marginBottom: '1.5%' }}>
-                                        <div className="col-3">
-                                        </div>
-                                        <div className="col-6">
-                                            <button>
-                                                Add to Cart
-                                            </button>
-                                        </div>
-                                    </div>
                                     <div className="row">
-                                        <Dish dishName={dish.dish_name} dishDescription={dish.dish_description} dishPrice={dish.dish_price} dishIngredients={dish.dish_ingredients} dishCategory={dish.dish_category} />
+                                        <DishCustomer restaurantId={this.props.location.state.restaurantId} dishId={dish.dish_id} dishName={dish.dish_name} dishDescription={dish.dish_description} dishPrice={dish.dish_price} dishIngredients={dish.dish_ingredients} dishCategory={dish.dish_category} />
                                     </div>
                                 </div>
                             )

@@ -32,6 +32,12 @@ const userReducer = (state = initialState, action) => {
             return Object.assign({}, state, {
                 signupStatus: 'ERR',
             });
+        case ActionTypes.LOG_OUT:
+            return Object.assign({}, state, {
+                loginStatus: false,
+                isRestaurantOwner: '',
+                signupStatus: ''
+            });
         default:
             return state;
     }

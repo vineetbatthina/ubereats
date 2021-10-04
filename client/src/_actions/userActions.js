@@ -22,3 +22,17 @@ export const loginUser = (credentials) => {
     }
 
 }
+
+export const logOutUser = () => {
+
+    return async dispatch => {
+        console.log("Dispatching customer logout ");
+        let payload = '';
+        
+        dispatch({
+            type: ActionTypes.UPDATE_CART,
+            payload
+        })
+    }
+
+}

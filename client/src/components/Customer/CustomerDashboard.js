@@ -26,6 +26,10 @@ export default class CustomerDashboard extends Component {
         console.log(restaurantId);
     }
 
+    componentWillUnmount(){
+        console.log("CustomerDashboardUnmount");
+    }
+
     render() {
         return (
             <div>

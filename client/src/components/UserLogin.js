@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import '../css/User.css';
-import { login } from '../services/index';
 import { connect } from "react-redux";
 import { loginUser } from '../_actions/index';
 import { Redirect } from 'react-router';
@@ -23,7 +22,7 @@ class UserLogin extends Component {
         this.props.setPageRedirect('signup');
     }
 
-    async handleLogin(event) {
+    handleLogin(event) {
         event.preventDefault();
         const credentials = {
             emailId: this.state.emailId,
@@ -39,6 +38,14 @@ class UserLogin extends Component {
             localStorage.setItem('isLoggedIn',this.props.loginStatus);
             localStorage.setItem('isRestaurantOwner',this.props.isRestaurantOwner);
             localStorage.setItem('emailId',this.state.emailId);
+
+            const cart_dishes = {
+                restaurantId: '',
+                dishes : []
+            }
+
+            localStorage.setItem('cart_dishes',JSON.stringify(cart_dishes));
+
             if (this.props.isRestaurantOwner === 'N') {
                 redirectComponent = <Redirect to="/custdashboard" />
             }

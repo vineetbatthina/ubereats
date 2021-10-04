@@ -16,16 +16,21 @@ export default class RestaurantSideBar extends Component {
         this.props.collapseSidebar();
     }
 
-    displayProfile(){
+    displayProfile() {
         this.props.renderProfile();
     }
 
-    displayMenu(){
+    displayMenu() {
         this.props.renderMenu();
     }
 
-    displayOrders(){
+    displayOrders() {
         this.props.renderOrders();
+    }
+
+    handleLogout(event) {
+        event.preventDefault();
+        window.location.href = '/userLogin';
     }
 
     render() {
@@ -41,10 +46,7 @@ export default class RestaurantSideBar extends Component {
                     <button className="res_sidebar_btns" onClick={this.displayOrders}>
                         Orders
                     </button>
-                    <button className="res_sidebar_btns" onClick={(e) => {
-                        e.preventDefault();
-                        window.location.href = '/userLogin';
-                    }}>
+                    <button className="res_sidebar_btns" onClick={this.handleLogout}>
                         Log Out
                     </button>
                 </div>

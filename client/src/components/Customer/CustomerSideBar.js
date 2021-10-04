@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import '../../css/SideBar.css';
+import {connect} from 'react-redux';
+import {logOutUser} from '../../_actions/userActions';
 
-export default class CustomerSideBar extends Component {
+class CustomerSideBar extends Component {
 
     constructor(props) {
         super(props);
 
         this.displayLandingPage = this.displayLandingPage.bind(this);
         this.displayProfile = this.displayProfile.bind(this);
+        this.handleLogout = this.handleLogout.bind(this);
     }
 
     displayLandingPage() {
@@ -22,9 +25,18 @@ export default class CustomerSideBar extends Component {
         localStorage.setItem('isLoggedIn',false);
         localStorage.setItem('isRestaurantOwner','');
         localStorage.setItem('emailId','');
+        const cart_dishes = {
+            restaurantId: '',
+            dishes : []
+        }
+
+        localStorage.setItem('cart_dishes',JSON.stringify(cart_dishes));
+        
+        this.props.logOutUser();
+
         window.location.href="/";
     }
-    
+
     render() {
         return (
             <div>
@@ -42,3 +54,11 @@ export default class CustomerSideBar extends Component {
         );
     }
 }
+
+const mapDispatchToProps = (dispatch) =>{
+    return {
+        logOutUser : () => dispatch(logOutUser())
+    }
+  }
+
+export default connect(null, mapDispatchToProps)(CustomerSideBar);

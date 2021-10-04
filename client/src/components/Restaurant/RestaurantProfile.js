@@ -72,7 +72,7 @@ export default class RestaurantProfile extends Component {
         return (
             <div className="container">
                 <form>
-                    <div className="form-group">
+                    <div className="form-group center_div">
                         <label htmlFor="formGroupExampleInput">Restaurant Name</label>
                         <input type="text" className="form-control" value = {this.state.restaurantName} onChange={(e) => this.setState({ restaurantName: e.target.value })}/>
                     </div>

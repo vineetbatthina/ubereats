@@ -29,3 +29,18 @@ export const addCustomerUser = (payload) => {
     }
 
 }
+
+export const updateCart = (payload) => {
+
+    return async dispatch => {
+        console.log("Updating Cart Action called");
+
+        dispatch({
+            type: ActionTypes.UPDATE_CART,
+            payload
+        })
+    }
+
+}
+
+

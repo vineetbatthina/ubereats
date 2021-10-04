@@ -1,29 +1,19 @@
 import { ActionTypes } from '../_constants';
 
 const initialState = {
-    users: [],
-    signupStatus: ''
+    cart : ''
 };
 
-const userReducer = (state = initialState, action) => {
+const customerReducer = (state = initialState, action) => {
 
     switch (action.type) {
-        case ActionTypes.ADD_CUSTOMER_USER:
+        case ActionTypes.UPDATE_CART:
             return Object.assign({}, state, {
-                users: state.users.concat(action.payload),
-                signupStatus: 'SUCCESS',
-            });
-        case ActionTypes.MULTIPLE_USERS:
-            return Object.assign({}, state, {
-                signupStatus: 'DUP',
-            });
-        case ActionTypes.USER_ADD_FAILED:
-            return Object.assign({}, state, {
-                signupStatus: 'ERR',
+                cart: action.payload,
             });
         default:
             return state;
     }
 }
 
-export default userReducer;
+export default customerReducer;

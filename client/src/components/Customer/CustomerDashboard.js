@@ -26,20 +26,13 @@ export default class CustomerDashboard extends Component {
         console.log(restaurantId);
     }
 
-    componentWillUnmount(){
-        console.log("CustomerDashboardUnmount");
-    }
-
     render() {
         return (
             <div>
                 < CustomerNavBar searchByLocation={this.searchByLocation}/>
-                <div className="row">
-                    <div className="col-3">
-                        <CustomerFilters />
 
-                    </div>
-                    <div className="col-9">
+                <div className="row">
+                    <div className="col" style={{marginLeft:'2%'}}>
                         <CustomerRestaurantsDisplay location={this.state.location} displayRestaurantDetail={this.displayRestaurantDetail}/>
                     </div>
                 </div>

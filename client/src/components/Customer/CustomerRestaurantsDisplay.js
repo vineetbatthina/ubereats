@@ -15,6 +15,10 @@ export default class CustomerRestaurantsDisplay extends Component {
     }
 
     async componentDidMount() {
+
+        const initMap = new Map();
+        localStorage.restaurantMap = JSON.stringify(Array.from(initMap));
+
         const restaurants = await getAllRestaurants();
         if (restaurants) {
             this.setState({
@@ -22,7 +26,15 @@ export default class CustomerRestaurantsDisplay extends Component {
                 showRestaurant : false,
                 restaurantIdSelected : ''
             })
+            
+            const restaurantMap = new Map(JSON.parse(localStorage.restaurantMap));
+            restaurants.map((restaurant) => {
+                restaurantMap.set(restaurant.restaurant_id,restaurant.store_name)
+            })
+            localStorage.restaurantMap = JSON.stringify(Array.from(restaurantMap));
         }
+
+        console.log(localStorage.restaurantMap);
     }
 
     displayLocalRestaurants(){

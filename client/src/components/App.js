@@ -9,6 +9,12 @@ import RestaurantPrivateRoute from '../services/RestaurantPrivateRoute';
 import CustomerPrivateRoute from '../services/CustomerPrivateRoute';
 import PublicRoute from '../services/PublicRoute';
 import RestaurantDisplay from './Common/RestaurantDisplay';
+import Checkout from './Customer/Checkout';
+import CustomerProfile from './Customer/CustomerProfile';
+import CustomerOrders from './Customer/Orders';
+import RestaurantProfile from './Restaurant/RestaurantProfile';
+import RestaurantMenu from './Restaurant/RestaurantMenu';
+import RestaurantOrders from './Restaurant/Orders';
 
 class App extends React.Component {
   render() {
@@ -19,8 +25,14 @@ class App extends React.Component {
           <PublicRoute exact path='/restaurant' component={RestaurantLoginLandingPage} />
           <PublicRoute exact path='/' component={LandingPage} />
           <RestaurantPrivateRoute exact path='/dashboard' component={Dashboard} />
+          <RestaurantPrivateRoute exact path='/restaurantProfile' component={RestaurantProfile} />
+          <RestaurantPrivateRoute exact path='/restaurantMenu' component={RestaurantMenu} />
+          <RestaurantPrivateRoute exact path='/restaurantOrders' component={RestaurantOrders} />
           <CustomerPrivateRoute exact path='/custdashboard' component={CustomerDashboard} />
           <CustomerPrivateRoute exact path='/restaurantDisplay' component={RestaurantDisplay} />
+          <CustomerPrivateRoute exact path='/checkout' component={Checkout} />
+          <CustomerPrivateRoute exact path='/customerProfile' component={CustomerProfile} />
+          <CustomerPrivateRoute exact path='/customerOrders' component={CustomerOrders} />
         </Switch>
       </Router>
     );

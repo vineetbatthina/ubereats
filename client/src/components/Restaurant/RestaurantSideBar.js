@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import '../../css/SideBar.css';
+import { Link } from 'react-router-dom';
 
 export default class RestaurantSideBar extends Component {
 
@@ -49,6 +50,18 @@ export default class RestaurantSideBar extends Component {
                     <button className="res_sidebar_btns" onClick={this.handleLogout}>
                         Log Out
                     </button>
+                    <Link to="/restaurantProfile" style={{ color: 'inherit' }} >
+                        <button className="res_sidebar_btns"> Profile </button>
+                    </Link>
+                    <Link to="/restaurantMenu" style={{ color: 'inherit' }} >
+                        <button className="res_sidebar_btns"> Menu </button>
+                    </Link>
+                    <Link to="/restaurantOrders" style={{ color: 'inherit' }} >
+                        <button className="res_sidebar_btns"> Orders </button>
+                    </Link>
+                    <Link to="/" style={{ color: 'inherit' }} >
+                        <button className="res_sidebar_btns" onClick={this.handleLogout}> Log Out </button>
+                    </Link>
                 </div>
                 <div className="blur" onClick={this.displayLandingPage}>
                 </div>

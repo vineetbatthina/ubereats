@@ -47,3 +47,46 @@ export async function getDishesbyResId(restaurantId) {
     }
     return dishes;
 }
+
+export async function sendOrders(order) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(order)
+    };
+    console.log("Client Side order sent:"+ order);
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/sendOrders', requestOptions);
+        let data = await fetchResponse;
+        if(data.status === 200){
+            return true;
+        }
+        else{
+            return false;
+        }
+    } catch (e) {
+        console.log(e);
+        return false;
+    }  
+}
+
+export async function getOrdersByCustEmail(emailId) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(emailId)
+    };
+    let orders = null;
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/getOrdersByCustEmail', requestOptions);
+        const data = await fetchResponse.json();
+        if(fetchResponse.status===200){
+            orders = data;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+    return orders;
+}

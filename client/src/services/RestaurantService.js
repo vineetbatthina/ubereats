@@ -49,6 +49,27 @@ export async function getRestaurantProfile(request) {
     }
 }
 
+export async function getRestaurantProfileByID(request) {
+
+    let resProfile = null;
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request)
+    };
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/getRestaurantProfileById', requestOptions);
+        const data = await fetchResponse.text();
+        if (fetchResponse.status === 200) {
+            resProfile = JSON.parse(data);
+        }
+        return resProfile;
+    } catch (e) {
+        console.log(e);
+        return -1;
+    }
+}
+
 export async function saveRestaurantProfile(restaurantProfile) {
 
     const requestOptions = {
@@ -99,4 +120,24 @@ export async function getDishes(emailId) {
         console.log(e);
     }
     return dishes;
+}
+
+export async function getOrdersByResId(emailId) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(emailId)
+    };
+    let orders = null;
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/getOrdersByResId', requestOptions);
+        const data = await fetchResponse.json();
+        if(fetchResponse.status===200){
+            orders = data;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+    return orders;
 }

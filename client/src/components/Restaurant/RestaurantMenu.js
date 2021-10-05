@@ -58,7 +58,7 @@ export default class RestaurantMenu extends Component {
                     {
                         this.state.dishes.map((dish) => {
                            return (
-                               <div className="col-3">
+                               <div className="col-3" key={dish.dish_id}>
                                    <Dish dishName={dish.dish_name} dishDescription={dish.dish_description} dishPrice={dish.dish_price} dishIngredients={dish.dish_ingredients} dishCategory={dish.dish_category}/>
                                 </div>
                            )

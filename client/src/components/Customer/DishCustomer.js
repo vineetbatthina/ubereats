@@ -59,7 +59,7 @@ class DishCustomer extends Component {
             existingCart.dishes.push({
                 dishId : this.props.dishId,
                 dishName : this.props.dishName,
-                dish_quantity : this.state.item_quantity,
+                dish_quantity : document.getElementById("item_quantity").value,
                 dish_price : this.props.dishPrice,
             });
             existingCart.restaurantId = this.props.restaurantId;
@@ -128,9 +128,7 @@ class DishCustomer extends Component {
                     </ul>
                 </div>
                 <div className="row">
-                    <div className="col-3" >
-                    </div>
-                    <div className="col" style={{ marginTop: '2%' }} onClick={buttonClick}>
+                    <div className="col" style={{ marginTop: '2%', marginLeft: '20%' }} onClick={buttonClick}>
                         <button>{buttonText}</button>
                     </div>
 
@@ -143,7 +141,7 @@ class DishCustomer extends Component {
                     <Modal.Body>
                         <center>
                             <p>{this.props.dishDescription}</p>
-                            Quantity: <input type="number" name="Item Name" min="1" max="10" width="10%" onChange={this.modifyQuantity} defaultValue="1" autoFocus></input>
+                            Quantity: <input type="number" name="Item Name" id="item_quantity" min="1" max="10" width="10%" onChange={this.modifyQuantity} defaultValue="1" autoFocus></input>
                         </center>
                     </Modal.Body>
                     <Modal.Footer>

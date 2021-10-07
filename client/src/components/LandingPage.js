@@ -2,6 +2,10 @@ import React from 'react';
 import '../css/App.css';
 import '../css/Generic.css';
 import LoginSideBar from './LoginSideBar';
+import { getAllRestaurants } from "../services/UserService";
+import RestaurantCard from "./Common/RestaurantCard";
+import LandingNavBar from './LandingNavBar';
+import { connect } from 'react-redux';
 
 class LandingPage extends React.Component {
 
@@ -10,46 +14,145 @@ class LandingPage extends React.Component {
 
     this.state = {
       sideNavbarVisible: false,
-      location : ''
+      location: '',
+      restaurants: [],
+      nearByRestaurants: [],
+      otherRestaurants: [],
+      showRestaurant: false,
+      restaurantIdSelected: '',
+      locationAvailable: false
     };
 
     this.loadSideNavBar = this.loadSideNavBar.bind(this);
     this.collapseSidebar = this.collapseSidebar.bind(this);
-    this.searchByLocation = this.searchByLocation.bind(this);
+    this.locationChangeHandler = this.locationChangeHandler.bind(this);
   }
 
   loadSideNavBar() {
-    this.setState({sideNavbarVisible: !this.state.sideNavbarVisible})
+    this.setState({ sideNavbarVisible: !this.state.sideNavbarVisible })
   }
 
   collapseSidebar() {
     this.setState({ sideNavbarVisible: false })
   }
 
-  searchByLocation(event){
-    if(event.key === 'Enter'){
-      console.log(this.state.location);
+  locationChangeHandler(location) {
+
+    let nearByRestaurants = [];
+    let otherRestaurants = [];
+
+    this.state.restaurants.map((restaurant) => {
+      if (restaurant.store_location === location) {
+        nearByRestaurants.push(restaurant);
+      }
+      else {
+        otherRestaurants.push(restaurant);
+      }
+    })
+
+    this.setState({
+      nearByRestaurants: nearByRestaurants,
+      otherRestaurants: otherRestaurants
+    })
+
+  }
+
+  async componentDidMount() {
+    const initMap = new Map();
+    localStorage.restaurantMap = JSON.stringify(Array.from(initMap));
+    const locationAvailable = (localStorage.getItem('location')) ? true : false;
+    const restaurants = await getAllRestaurants();
+    const nearByRestaurants = [];
+    const otherRestaurants = [];
+
+    if (restaurants) {
+
+      if (locationAvailable) {
+        restaurants.map((restaurant) => {
+          if (restaurant.store_location === localStorage.getItem('location')) {
+            nearByRestaurants.push(restaurant);
+          }
+          else {
+            otherRestaurants.push(restaurant);
+          }
+        })
+      }
+
+      this.setState({
+        restaurants: restaurants,
+        showRestaurant: false,
+        restaurantIdSelected: '',
+        locationAvailable: locationAvailable,
+        nearByRestaurants: nearByRestaurants,
+        otherRestaurants: otherRestaurants
+      })
+
+      const restaurantMap = new Map(JSON.parse(localStorage.restaurantMap));
+      restaurants.map((restaurant) => {
+        restaurantMap.set(restaurant.restaurant_id, restaurant.store_name)
+      })
+      localStorage.restaurantMap = JSON.stringify(Array.from(restaurantMap));
     }
+
+    console.log(localStorage.restaurantMap);
   }
 
   render() {
+    let hideNearByRestuarants = false;
+    hideNearByRestuarants = (localStorage.getItem('location')) ? false : true;
+
+    if (this.state) {
+      hideNearByRestuarants = !this.state.locationAvailable || this.state.nearByRestaurants.length === 0;
+    }
+
     return (
-      <div className="landing_page">
-        <div>
-          {this.state.sideNavbarVisible === true ? <LoginSideBar collapseSidebar={this.collapseSidebar} /> : null}
+      <div>
+        <LandingNavBar changedLocation={this.locationChangeHandler} />
+        <div style={{ marginLeft: "3%" }}>
+          <div hidden={hideNearByRestuarants}>
+            <div>
+              <h2>Serving Near You</h2>
+            </div>
+            <div >
+              {
+                this.state.nearByRestaurants.map((restaurant) => {
+                  return (
+                    <div className="col" key={restaurant.restaurant_id}>
+                      <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForGuest" source="guest" />
+                    </div>
+                  )
+                })
+              }
+            </div>
+          </div>
+          <div hidden={this.state.otherRestaurants.length===0}>
+            <div>
+              <h2>Couldn't find restaurants at your place? Explore other restaurants ! </h2>
+            </div>
+            <div >
+              {
+                this.state.otherRestaurants.map((restaurant) => {
+                  return (
+                    <div className="col" key={restaurant.restaurant_id}>
+                      <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForGuest" source="guest" />
+                    </div>
+                  )
+                })
+              }
+            </div>
+          </div>
         </div>
-        <div className="navbar">
-          <span className="hamburger" onClick={this.loadSideNavBar}>&#9776;</span>
-          <a href="/">
-            <img alt="Uber Eats Home" role="img" src="https://d3i4yxtzktqr9n.cloudfront.net/web-eats-v2/ee037401cb5d31b23cf780808ee4ec1f.svg" width="146" height="24" />
-          </a>
-          <input type="text" placeholder="Enter delivery address" value={this.state.location} onChange={(e) => this.setState({ location: e.target.value })} className="location_input" onKeyDown={this.searchByLocation}></input>
-          <a href="/userLogin"><button className="button" id="signin_btn" href="/userLogin">Sign In</button></a>
-        </div>
+
       </div>
 
     );
   }
 }
 
-export default LandingPage;
+const mapStateToProps = state => {
+  return {
+    location: state.userReducer.location
+  };
+};
+
+export default connect(mapStateToProps)(LandingPage)

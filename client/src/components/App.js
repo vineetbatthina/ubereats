@@ -24,12 +24,13 @@ class App extends React.Component {
           <PublicRoute path='/userLogin' component={UserLoginLandingPage} />
           <PublicRoute exact path='/restaurant' component={RestaurantLoginLandingPage} />
           <PublicRoute exact path='/' component={LandingPage} />
+          <PublicRoute exact path='/restaurantDisplayForGuest' component={RestaurantDisplay} />
           <RestaurantPrivateRoute exact path='/dashboard' component={Dashboard} />
           <RestaurantPrivateRoute exact path='/restaurantProfile' component={RestaurantProfile} />
           <RestaurantPrivateRoute exact path='/restaurantMenu' component={RestaurantMenu} />
           <RestaurantPrivateRoute exact path='/restaurantOrders' component={RestaurantOrders} />
           <CustomerPrivateRoute exact path='/custdashboard' component={CustomerDashboard} />
-          <CustomerPrivateRoute exact path='/restaurantDisplay' component={RestaurantDisplay} />
+          <CustomerPrivateRoute exact path='/restaurantDisplayForCustomer' component={RestaurantDisplay} />
           <CustomerPrivateRoute exact path='/checkout' component={Checkout} />
           <CustomerPrivateRoute exact path='/customerProfile' component={CustomerProfile} />
           <CustomerPrivateRoute exact path='/customerOrders' component={CustomerOrders} />

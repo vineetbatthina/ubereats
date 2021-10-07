@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import '../css/User.css';
 import UserLogin from "./UserLogin";
-import UserSignup from "./UserSignup";
+import CustomerSignup from "./Customer/CustomerSignup";
 
 export default class UserLoginLandingPage extends Component {
 
@@ -20,12 +20,13 @@ export default class UserLoginLandingPage extends Component {
 
     render() {
         return (
-            <div className="center-div">
-                <a href="/" id="uber-eats-signin-img">
-                    <img alt="Uber Eats Home" role="img" src="https://d3i4yxtzktqr9n.cloudfront.net/web-eats-v2/ee037401cb5d31b23cf780808ee4ec1f.svg" width="200" height="40" />
-                </a>
-                {this.state.page==='signup' ? <UserSignup setPageRedirect={this.setPageRedirect}/> : < UserLogin setPageRedirect={this.setPageRedirect} />}
-            </div>
+                <div className="center-div">
+                    <a href="/" id="uber-eats-signin-img">
+                        <img alt="Uber Eats Home" role="img" src="https://d3i4yxtzktqr9n.cloudfront.net/web-eats-v2/ee037401cb5d31b23cf780808ee4ec1f.svg" width="200" height="40" />
+                    </a>
+                    {this.state.page === 'signup' ? <CustomerSignup setPageRedirect={this.setPageRedirect} /> : < UserLogin setPageRedirect={this.setPageRedirect} />}
+                </div>
+
         );
     }
 }

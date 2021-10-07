@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import '../css/User.css';
+import '../../css/User.css';
 import { connect } from "react-redux";
 import { Redirect } from 'react-router';
-import { addCustomerUser } from "../_actions/index";
+import { addCustomerUser } from "../../_actions/index";
 
-class UserSignup extends Component {
+class CustomerSignup extends Component {
 
     constructor(props) {
         super(props);
@@ -83,4 +83,4 @@ const mapStateToProps = state => {
      };
 };
 
-  export default connect(mapStateToProps , mapDispatchToProps)(UserSignup);
+  export default connect(mapStateToProps , mapDispatchToProps)(CustomerSignup);

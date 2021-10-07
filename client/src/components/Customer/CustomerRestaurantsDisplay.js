@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import '../../css/Customer.css';
-import { getAllRestaurants } from '../../services/CustomerService';
+import { getAllRestaurants } from '../../services/UserService';
 import RestaurantCard from "../Common/RestaurantCard";
 
 export default class CustomerRestaurantsDisplay extends Component {
@@ -23,8 +23,6 @@ export default class CustomerRestaurantsDisplay extends Component {
         if (restaurants) {
             this.setState({
                 restaurants: restaurants,
-                showRestaurant : false,
-                restaurantIdSelected : ''
             })
             
             const restaurantMap = new Map(JSON.parse(localStorage.restaurantMap));
@@ -60,7 +58,7 @@ export default class CustomerRestaurantsDisplay extends Component {
                         this.state.restaurants.map((restaurant) => {
                            return (
                                <div className="col" key={restaurant.restaurant_id}>
-                                   <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantId = {restaurant.restaurant_id}/>
+                                   <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantId = {restaurant.restaurant_id} pathName="/restaurantDisplayForCustomer" source="customer"/>
                                 </div>
                            )
                         })

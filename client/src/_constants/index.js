@@ -10,6 +10,7 @@ export const ActionTypes = {
     RES_ADD_FAILED: 'RES_ADD_FAILED',
     LOG_OUT : 'LOG_OUT',
 
-    UPDATE_CART : 'UPDATE_CART'
+    UPDATE_CART : 'UPDATE_CART',
+    STORE_LOCATION : 'STORE_LOCATION'
 }
   

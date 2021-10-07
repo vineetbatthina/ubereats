@@ -36,3 +36,16 @@ export const logOutUser = () => {
     }
 
 }
+
+export const storeLocation = (payload) => {
+
+    return async dispatch => {
+        console.log("Dispatching entered Location ");
+        
+        dispatch({
+            type: ActionTypes.STORE_LOCATION,
+            payload
+        })
+    }
+
+}

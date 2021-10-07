@@ -27,3 +27,10 @@ export async function createUser(user) {
         return -1;
     }  
 }
+
+export async function getAllRestaurants() {
+    let data =null;
+    const response = await fetch('http://localhost:3080/api/getAllRestaurants');
+    data = await response.json();
+    return data;
+}

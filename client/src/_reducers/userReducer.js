@@ -38,6 +38,10 @@ const userReducer = (state = initialState, action) => {
                 isRestaurantOwner: '',
                 signupStatus: ''
             });
+        case ActionTypes.STORE_LOCATION:
+            return Object.assign({}, state, {
+                location : action.payload
+            });
         default:
             return state;
     }

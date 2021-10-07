@@ -14,11 +14,12 @@ export default class RestaurantCard extends Component {
             <div className="card margin_bottom" style={{ width: '10rem' }} >
                 <Link
                     to={{
-                        pathname: "/restaurantDisplay",
+                        pathname: this.props.pathName,
                         state: {
                             restaurantId: this.props.restaurantId,
                             restaurantName: this.props.restaurantName,
-                            restaurantDescription: this.props.restaurantDescription
+                            restaurantDescription: this.props.restaurantDescription,
+                            source : this.props.source
                         }
                     }}>
                     <img src={restaurantImage} className="img-thumbnail" onError={(e) => { e.target.onerror = null; e.target.src = "../../images/default_dish.jpg" }} />

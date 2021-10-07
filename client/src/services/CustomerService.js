@@ -90,3 +90,69 @@ export async function getOrdersByCustEmail(emailId) {
     }
     return orders;
 }
+
+export async function getCustomerProfileByEmailId(emailId) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(emailId)
+    };
+    let profile = null;
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/getCustomerProfileByEmailId', requestOptions);
+        const data = await fetchResponse.json();
+        if(fetchResponse.status===200){
+            profile = data;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+    return profile;
+}
+
+export async function saveCustomerProfile(request) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request)
+    };
+    let profile = null;
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/saveCustomerProfile', requestOptions);
+        let data = await fetchResponse;
+        if(data.status === 200){
+            return true;
+        }
+        else{
+            return false;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+    return profile;
+}
+
+export async function updateCustomerProfile(request) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request)
+    };
+    let profile = null;
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/updateCustomerProfile', requestOptions);
+        let data = await fetchResponse;
+        if(data.status === 200){
+            return true;
+        }
+        else{
+            return false;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+    return profile;
+}

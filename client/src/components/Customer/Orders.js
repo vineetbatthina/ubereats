@@ -63,7 +63,7 @@ export default class Orders extends Component {
         return (
             <div>
                 < CustomerNavBar searchByLocation={this.searchByLocation} />
-                <div hidden={!this.state.showCurrOrders}>
+                <div hidden={!this.state.showCurrOrders} style={{paddingLeft:'3%'}}>
                     <h3> Current Orders </h3>
                     <div >
                         {
@@ -158,7 +158,7 @@ export default class Orders extends Component {
                     <h3> Previous Orders </h3>
                     <div >
                         {
-                            this.state.showPrevOrders.map((order) => {
+                            this.state.previousOrders.map((order) => {
                                 return (
                                     <div key={order.order_id}>
                                         <div className="container">

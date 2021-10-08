@@ -38,18 +38,6 @@ export default class RestaurantSideBar extends Component {
         return (
             <div>
                 <div className="sideBar">
-                    <button className="res_sidebar_btns" onClick={this.displayProfile}>
-                        Profile
-                    </button>
-                    <button className="res_sidebar_btns" onClick={this.displayMenu}>
-                        Menu
-                    </button>
-                    <button className="res_sidebar_btns" onClick={this.displayOrders}>
-                        Orders
-                    </button>
-                    <button className="res_sidebar_btns" onClick={this.handleLogout}>
-                        Log Out
-                    </button>
                     <Link to="/restaurantProfile" style={{ color: 'inherit' }} >
                         <button className="res_sidebar_btns"> Profile </button>
                     </Link>

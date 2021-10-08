@@ -35,16 +35,16 @@ class UserLogin extends Component {
         let redirectComponent = null;
         if (this.props.loginStatus === true) {
             alert("Login is successful");
-            localStorage.setItem('isLoggedIn',this.props.loginStatus);
-            localStorage.setItem('isRestaurantOwner',this.props.isRestaurantOwner);
-            localStorage.setItem('emailId',this.state.emailId);
+            localStorage.setItem('isLoggedIn', this.props.loginStatus);
+            localStorage.setItem('isRestaurantOwner', this.props.isRestaurantOwner);
+            localStorage.setItem('emailId', this.state.emailId);
 
             const cart_dishes = {
                 restaurantId: '',
-                dishes : []
+                dishes: []
             }
 
-            localStorage.setItem('cart_dishes',JSON.stringify(cart_dishes));
+            localStorage.setItem('cart_dishes', JSON.stringify(cart_dishes));
 
             if (this.props.isRestaurantOwner === 'N') {
                 redirectComponent = <Redirect to="/custdashboard" />
@@ -57,14 +57,40 @@ class UserLogin extends Component {
         return (
             <div>
                 {redirectComponent}
-                <form className="forms" id="signin_form" onSubmit={this.handleLogin}>
-                    Email Id:<br />
-                    <input type="email" required value={this.state.emailId} onChange={(e) => this.setState({ emailId: e.target.value })}></input><br />
-                    Password:<br />
-                    <input type="password" required value={this.state.pwd} onChange={(e) => this.setState({ pwd: e.target.value })}></input><br />
-                    <button type="submit" id="login_btn">Login</button>
+                <form onSubmit={this.handleLogin} id="signin_form" style={{ marginLeft: '3%' }}>
+                    <div className="row">
+                        <div className="col">
+                            <h5>Email Id:</h5>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-6">
+                            <input type="email" required value={this.state.emailId} onChange={(e) => this.setState({ emailId: e.target.value })} className="form-control" placeholder="Email Id" ></input>
+                        </div>
+                    </div>
+                    <br/>
+                    <div className="row">
+                        <div className="col">
+                            <h5>Password:</h5>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-6">
+                            <input type="password" required value={this.state.pwd} onChange={(e) => this.setState({ pwd: e.target.value })} className="form-control" placeholder="Enter Your Password" ></input>
+                        </div>
+                    </div>
+                    <br/>
+                    <div className="row">
+                        <div className="col">
+                            <button type="submit" id="login_btn" className="btn btn-dark">Login</button>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col">
+                            <button id="signup_btn" onClick={this.setPageProp} className="btn btn-dark">Don't have an account? Signup</button>
+                        </div>
+                    </div>
                 </form>
-                <button id="signup_btn" onClick={this.setPageProp}>Don't have an account? Signup</button>
                 <div className="container">
                     <br />
                     <div className="row">

@@ -141,3 +141,47 @@ export async function getOrdersByResId(emailId) {
     }
     return orders;
 }
+
+export async function updateOrder(request) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request)
+    };
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/updateOrder', requestOptions);
+        let data = await fetchResponse;
+        if(data.status === 200){
+            return true;
+        }
+        else{
+            return false;
+        }
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+}
+
+export async function updateDish(request) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request)
+    };
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/updateDish', requestOptions);
+        let data = await fetchResponse;
+        if(data.status === 200){
+            return true;
+        }
+        else{
+            return false;
+        }
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+}

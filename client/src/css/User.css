@@ -1,23 +1,5 @@
 .center-div{
     margin : 8% 0% 0% 35%;
-    width: 800px;
-}
-
-.forms{
-    font-size: 150%;
-}
-
-.forms input {
-    margin: 2% 0 2% 0;
-    width: 50%;
-    height: 10%;
-    font-size: 16pt;
-    border-radius: 10px;
-}
-
-.forms button {
-    background-color: black;
-    color: white;
 }
 
 #signin_form , #signup_form{
@@ -26,9 +8,8 @@
 }
 
 #login_btn , #signup_btn{
-    width: 51%;
+    width: 49%;
     margin-top:1%;
-    border-radius: 10px;
 }
 
 button {

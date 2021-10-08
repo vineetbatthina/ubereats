@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { saveDish } from "../../services/RestaurantService";
 
-export default class RestaurantMenuEdit extends Component {
+export default class RestaurantMenuAdd extends Component {
 
     constructor(props) {
         super(props);
@@ -54,12 +54,14 @@ export default class RestaurantMenuEdit extends Component {
                 dishMessege: "Dish couldn't be saved contact administrator"
             })
         }
+
+        this.props.fetchDishes();
     }
 
     render() {
         return (
-            <div className="container">
-                <form onSubmit={this.saveItem}>
+            <div>
+                <form onSubmit={this.saveItem} style={{marginLeft:'3%'}}>
                     <div className="row">
                         <div className="col-3">
                             Dish Images<input type="file" className="form-control-file" placeholder="Dish Image Upload"></input>
@@ -104,12 +106,6 @@ export default class RestaurantMenuEdit extends Component {
                 </form>
                 <br />
                 <div className="" id="save_items_msg"> {this.state.dishMessege} </div>
-                <br />
-                <div className="row">
-                    <div className="col">
-                        Will Display Items Here
-                    </div>
-                </div>
             </div>
         )
     }

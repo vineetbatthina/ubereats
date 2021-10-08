@@ -51,6 +51,7 @@ router.post('/api/saveRestaurantProfile', async (req, res) => {
   });
 });
 
+
 router.post('/api/getRestaurantProfile', async (req, res) => {
 
   const emailId = req.body.emailId;
@@ -219,6 +220,42 @@ router.post('/api/getOrdersByResId', async (req, res) => {
         'Content-Type': 'text/plain',
       });
       res.end();
+    }
+  });
+});
+
+router.post('/api/updateOrder', async (req, res) => {
+
+  const order = req.body;
+  console.log(order);
+  const update_order = `UPDATE orders set status = ? where order_id = ?`
+  await connection.query(update_order, [order.status,order.order_id], async function (error, results) {
+    if (error) {
+      console.log(error);
+      console.log('Order with Order Id '+ order.order_id + 'could not be updated');
+      res.send("Update of order failed");
+    }
+    else {
+      console.log('Order updated');
+      res.send("Successful");
+    }
+  });
+});
+
+router.post('/api/updateDish', async (req, res) => {
+
+  const dish = req.body;
+  console.log(dish);
+  const update_dish = `UPDATE dishes set dish_name = ?, dish_description = ? ,dish_price = ? , dish_ingredients = ? , dish_category = ? where dish_id = ?`
+  await connection.query(update_dish, [dish.dishName,dish.dishDescription,dish.dishPrice,dish.dishIngredients,dish.dishCategory,dish.dishId], async function (error, results) {
+    if (error) {
+      console.log(error);
+      console.log('Diswh with Dish Id '+ dish.dishId + 'could not be updated');
+      res.send("Update of Dish failed");
+    }
+    else {
+      console.log('Dish updated');
+      res.send("Successful");
     }
   });
 });

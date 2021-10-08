@@ -1,7 +1,6 @@
 import React from 'react';
 import '../css/App.css';
 import '../css/Generic.css';
-import LoginSideBar from './LoginSideBar';
 import { getAllRestaurants } from "../services/UserService";
 import RestaurantCard from "./Common/RestaurantCard";
 import LandingNavBar from './LandingNavBar';
@@ -41,7 +40,7 @@ class LandingPage extends React.Component {
     let nearByRestaurants = [];
     let otherRestaurants = [];
 
-    this.state.restaurants.map((restaurant) => {
+    this.state.restaurants.forEach((restaurant) => {
       if (restaurant.store_location === location) {
         nearByRestaurants.push(restaurant);
       }
@@ -52,7 +51,8 @@ class LandingPage extends React.Component {
 
     this.setState({
       nearByRestaurants: nearByRestaurants,
-      otherRestaurants: otherRestaurants
+      otherRestaurants: otherRestaurants,
+      locationAvailable: (location!=='') ? true : false 
     })
 
   }
@@ -67,8 +67,7 @@ class LandingPage extends React.Component {
 
     if (restaurants) {
 
-      if (locationAvailable) {
-        restaurants.map((restaurant) => {
+        restaurants.forEach((restaurant) => {
           if (restaurant.store_location === localStorage.getItem('location')) {
             nearByRestaurants.push(restaurant);
           }
@@ -76,7 +75,7 @@ class LandingPage extends React.Component {
             otherRestaurants.push(restaurant);
           }
         })
-      }
+      
 
       this.setState({
         restaurants: restaurants,
@@ -88,7 +87,7 @@ class LandingPage extends React.Component {
       })
 
       const restaurantMap = new Map(JSON.parse(localStorage.restaurantMap));
-      restaurants.map((restaurant) => {
+      restaurants.forEach((restaurant) => {
         restaurantMap.set(restaurant.restaurant_id, restaurant.store_name)
       })
       localStorage.restaurantMap = JSON.stringify(Array.from(restaurantMap));

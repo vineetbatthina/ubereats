@@ -98,3 +98,13 @@
       background-color: red;
       height : 100%
   }
+
+.caption {
+    position: absolute;
+    top: 20%;
+    left: 0;
+    width: 100%;
+    color: white ;
+    font-size: xx-large;
+    font-family:cursive;
+}

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import '../../css/Generic.css';
 import { getRestaurantProfile, saveRestaurantProfile } from '../../services/RestaurantService';
+import RestaurantNavBar from './RestaurantNavBar';
 
 export default class RestaurantProfile extends Component {
 
@@ -82,8 +83,9 @@ export default class RestaurantProfile extends Component {
 
     render() {
         return (
-            <div className="container">
-                <form>
+            <div>
+                <RestaurantNavBar />
+                <form style={{marginLeft:'3%'}}>
                     <div className="form-group center_div">
                         <label htmlFor="formGroupExampleInput">Restaurant Name</label>
                         <input type="text" className="form-control" value = {this.state.restaurantName} onChange={(e) => this.setState({ restaurantName: e.target.value })}/>

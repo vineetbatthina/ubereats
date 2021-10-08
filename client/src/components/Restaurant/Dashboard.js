@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
-import '../../css/App.css';
-import '../../css/Generic.css';
+import RestaurantNavBar from './RestaurantNavBar';
+import res_default_image from '../../images/landing_page_background.jpg';
 import '../../css/Restaurant.css';
-import RestaurantSideBar from './RestaurantSideBar';
-import RestaurantProfile from './RestaurantProfile';
-import RestaurantMenu from './RestaurantMenu';
-import RestaurantMenuEdit from './RestaurantMenuEdit';
-import Orders from './Orders';
+import { getRestaurantProfile } from '../../services/RestaurantService';
+
 
 export default class Dashboard extends Component {
 
@@ -14,100 +11,60 @@ export default class Dashboard extends Component {
         super(props);
 
         this.state = {
-            sideNavbarVisible: false,
-            showProfile: false,
-            showMenu: false,
-            showEditMenu : false,
-            showOrders : false,
-        };
-
-        this.loadSideNavBar = this.loadSideNavBar.bind(this);
-        this.collapseSidebar = this.collapseSidebar.bind(this);
-        this.renderProfile = this.renderProfile.bind(this);
-        this.renderMenu = this.renderMenu.bind(this);
-        this.renderEditMenu = this.renderEditMenu.bind(this);
-        this.renderOrders = this.renderOrders.bind(this);
+            restaurantName: '',
+            location: '',
+            description: '',
+            timings: '',
+            emailId: '',
+            phone: '',
+            street : '',
+            state : '',
+            country : '',
+            pincode : '',
+            saveMessege: true
+        }
     }
 
-    loadSideNavBar() {
-        this.setState({ sideNavbarVisible: !this.state.sideNavbarVisible })
-    }
-
-    collapseSidebar() {
-        this.setState({ sideNavbarVisible: false })
-    }
-
-    renderProfile() {
-        this.setState({
-            showOrders : false,
-            showEditMenu : false,
-            showMenu: false,
-            showProfile: true,
-            sideNavbarVisible: false
-        });
-    }
-
-    renderMenu() {
-        this.setState({
-            showOrders : false,
-            showEditMenu : false,
-            showMenu: true,
-            showProfile: false,
-            sideNavbarVisible: false
-         });
-    }
-
-    renderEditMenu(){
-        this.setState({ 
-            showOrders : false,
-            showEditMenu : true,
-            showMenu: false,
-            showProfile: false,
-            sideNavbarVisible: false
-         });
-    }
-
-    renderOrders(){
-        this.setState({ 
-            showOrders : true,
-            showEditMenu : false,
-            showMenu: false,
-            showProfile: false,
-            sideNavbarVisible: false
-         });
-    }
-
-    handleLogout(){
-        localStorage.setItem('isLoggedIn',false);
-        localStorage.setItem('isRestaurantOwner','');
-        localStorage.setItem('emailId','');
-        window.location.href="/";
+    async componentDidMount(){
+        let emailId = 'default@default.com';
+        try {
+            emailId = localStorage.getItem('emailId');
+        }
+        catch (error) {
+            console.log(error);
+        }
+        const request = {
+            emailId: emailId
+        }
+        const restaurantProfile = await getRestaurantProfile(request);
+        if (restaurantProfile) {
+            this.setState({
+                restaurantName: restaurantProfile.store_name,
+                location: restaurantProfile.store_location,
+                description: (restaurantProfile.description) ? restaurantProfile.description : '',
+                timings: (restaurantProfile.timings) ? restaurantProfile.timings : '',
+                emailId: localStorage.getItem('emailId'),
+                phone: (restaurantProfile.phone) ? restaurantProfile.phone : '',
+                street: (restaurantProfile.street) ? restaurantProfile.street : '',
+                state: (restaurantProfile.state) ? restaurantProfile.state : '',
+                country: (restaurantProfile.country) ? restaurantProfile.country : '',
+                pincode: (restaurantProfile.pincode) ? restaurantProfile.pincode : ''
+            })
+        }
     }
 
     render() {
         return (
-            <div className="landing_page">
+            <div>
+                <RestaurantNavBar />
                 <div>
-                    {this.state.sideNavbarVisible === true ? <RestaurantSideBar collapseSidebar={this.collapseSidebar} renderProfile={this.renderProfile} renderMenu={this.renderMenu} renderOrders={this.renderOrders} /> : null}
-                </div>
-                <div className="navbar">
-                    <span className="hamburger" onClick={this.loadSideNavBar}>&#9776;</span>
-                    <a href="/">
-                        <img alt="Uber Eats Home" role="img" src="https://d3i4yxtzktqr9n.cloudfront.net/web-eats-v2/ee037401cb5d31b23cf780808ee4ec1f.svg" width="146" height="24" />
-                    </a>
-                    <a href="/"><button className="button" id="logout_btn" onClick={this.handleLogout}>Logout</button></a>
-                </div>
-                <div className="container">
-                    {this.state.showProfile === true ? <RestaurantProfile /> : null}
-                </div>
-                <div className="container">
-                    {this.state.showMenu === true ? <RestaurantMenu renderEditMenu={this.renderEditMenu}/> : null}
-                </div>
-                <div className="container">
-                    {this.state.showEditMenu === true ? <RestaurantMenuEdit /> : null}
-                </div>
-                <div className="container">
-                    {this.state.showOrders === true ? <Orders /> : null}
+                    <div class="text-center">
+                        <img src={res_default_image} className="img-fluid" onError={(e) => { e.target.onerror = null; e.target.src = "../../images/default_dish.jpg" }} />
+                        <div class="caption">
+                            <h1>{this.state.restaurantName}</h1>
+                            <p>{this.state.description}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         );

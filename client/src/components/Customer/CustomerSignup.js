@@ -53,18 +53,62 @@ class CustomerSignup extends Component {
         return (
             <div>
                 {redirectComponent}
-                <form className="forms" id="signup_form" onSubmit={this.storeUser}>
-                    Email Id:<br />
-                    <input type="email" value={this.state.emailId} onChange={(e) => this.setState({ emailId: e.target.value })} required></input><br />
-                    User Name:<br />
-                    <input type="text" value={this.state.userName} onChange={(e) => this.setState({ userName: e.target.value })} required></input><br />
-                    Password:<br />
-                    <input type="password" value={this.state.password} onChange={(e) => this.setState({ password: e.target.value })} required></input><br />
-                    Re Enter Password:<br />
-                    <input type="password" value={this.state.reEnterPassword} onChange={(e) => this.setState({ reEnterPassword: e.target.value })} required></input><br />
-                    <button type="submit" id="signup_btn">Sign Up</button>
+                <form id="signup_form" onSubmit={this.storeUser} style={{ marginLeft: '3%' }}>
+                    <div className="row">
+                        <div className="col">
+                            <h5>Email Id:</h5>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-6">
+                            <input type="email" value={this.state.emailId} onChange={(e) => this.setState({ emailId: e.target.value })} required className="form-control" placeholder="Email Id" ></input>
+                        </div>
+                    </div>
+                    <br/>
+                    <div className="row">
+                        <div className="col">
+                            <h5>User Name:</h5>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-6">
+                            <input type="text" value={this.state.userName} onChange={(e) => this.setState({ userName: e.target.value })} required className="form-control" placeholder="Email Id" ></input>
+                        </div>
+                    </div>
+                    <br/>
+                    <div className="row">
+                        <div className="col">
+                            <h5>Password:</h5>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-6">
+                            <input type="password" value={this.state.password} onChange={(e) => this.setState({ password: e.target.value })} required className="form-control" placeholder="Enter Your Password" ></input>
+                        </div>
+                    </div>
+                    <br/>
+                    <div className="row">
+                        <div className="col">
+                            <h5>Re Enter Password:</h5>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-6">
+                            <input type="password" value={this.state.reEnterPassword} onChange={(e) => this.setState({ reEnterPassword: e.target.value })} required className="form-control" placeholder="Enter Your Password" ></input>
+                        </div>
+                    </div>
+                    <br/>
+                    <div className="row">
+                        <div className="col">
+                            <button type="submit" id="signup_btn" className="btn btn-dark">Sign Up</button>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col">
+                            <button id="login_btn" onClick={this.setPageProp} className="btn btn-dark">Already have an account ? Log in</button>
+                        </div>
+                    </div>
                 </form>
-                <button id="signup_btn" onClick={this.setPageProp}>Already have an account ? Log in </button>
             </div>
 
         );

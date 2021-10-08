@@ -31,8 +31,13 @@ class LandingNavBar extends React.Component {
   searchByLocation(event){
     if(event.key === 'Enter'){
       localStorage.setItem('location',this.state.location);
-      this.props.changedLocation(this.state.location);
       this.props.setLocation(this.state.location);
+      if(this.props.changedLocation){
+        this.props.changedLocation(this.state.location);
+      }
+      else{
+          window.location.href="/";
+      }
     }
   }
 

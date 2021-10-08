@@ -42,14 +42,14 @@ router.post('/api/sendOrders', async (req, res) => {
   const totalPrice = req.body.totalPrice;
 
   console.log('Saving Order....');
-  const insert_order_query = `INSERT INTO orders ( cust_email_id, restaurant_id, dishes_ordered, delivery_address, order_timestamp, payment_mode, order_price, status) values (?,?,?,?,?,?,?,'RECIEVED')`
+  const insert_order_query = `INSERT INTO orders ( cust_email_id, restaurant_id, dishes_ordered, delivery_address, order_timestamp, payment_mode, order_price, status) values (?,?,?,?,?,?,?,'RECEIVED')`
   await connection.query(insert_order_query, [custEmailId, restaurantId, dishes, deliveryAddress, orderTimeStamp, paymentMode, totalPrice], async function (error, results) {
     if (error) {
       console.log("Not Successfull");
       res.send(JSON.stringify(error));
     }
     else {
-      console.log('Successfully Recieved an Order');
+      console.log('Successfully Received an Order');
       res.send(JSON.stringify(results));
     }
   });

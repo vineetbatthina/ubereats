@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { getRestaurantProfileByID } from '../../services/RestaurantService';
+import { getCustomerProfileByEmailId } from '../../services/CustomerService';
 import '../../css/Generic.css';
 import { sendOrders } from '../../services/CustomerService';
 import { Link } from "react-router-dom";
@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 
 import { updateCart } from '../../_actions/index';
+import CustomerNavBar from './CustomerNavBar';
 
 class Checkout extends Component {
 
@@ -15,11 +16,11 @@ class Checkout extends Component {
         super(props);
         this.state = {
             restaurantName: '',
-            location: '',
             timings: '',
             emailId: '',
             phone: '',
             street: '',
+            city:'',
             state: '',
             country: '',
             pincode: '',
@@ -35,68 +36,71 @@ class Checkout extends Component {
 
         const currentDate = new Date();
 
-        const order = {
-            custEmailId: localStorage.getItem('emailId'),
-            restaurantId: this.props.location.state.restaurantId,
-            dishes: JSON.stringify(this.state.dishes),
-            deliveryAddress: JSON.stringify({
-                street: this.state.street,
-                state: this.state.state,
-                country: this.state.country,
-                pincode: this.state.pincode
-            }),
-            orderTimeStamp: String(currentDate),
-            paymentMode: modeofPayment,
-            totalPrice: this.state.totalPrice,
-        }
-
-        console.log(order);
-
-        let order_successful = await sendOrders(order);
-
-        if (order_successful) {
-            alert("Order Placed Successfully");
-            const cart_dishes = {
-                restaurantId: '',
-                dishes : []
+        if(this.state.street!=='' && this.state.state!=='' && this.state.city!=='' && this.state.country!=='' && this.state.pincode!=='' ){
+            const order = {
+                custEmailId: localStorage.getItem('emailId'),
+                restaurantId: this.props.location.state.restaurantId,
+                dishes: JSON.stringify(this.state.dishes),
+                deliveryAddress: JSON.stringify({
+                    street: this.state.street,
+                    city: this.state.city,
+                    state: this.state.state,
+                    country: this.state.country,
+                    pincode: this.state.pincode
+                }),
+                orderTimeStamp: String(currentDate),
+                paymentMode: modeofPayment,
+                totalPrice: this.state.totalPrice,
             }
-            localStorage.setItem('cart_dishes',JSON.stringify(cart_dishes));
-            this.props.updateCart(localStorage.getItem("cart_dishes"));
-            this.setState({
-                orderSuccessfull : true
-            });
+    
+            console.log(order);
+    
+            let order_successful = await sendOrders(order);
+    
+            if (order_successful) {
+                alert("Order Placed Successfully");
+                const cart_dishes = {
+                    restaurantId: '',
+                    dishes : []
+                }
+                localStorage.setItem('cart_dishes',JSON.stringify(cart_dishes));
+                this.props.updateCart(localStorage.getItem("cart_dishes"));
+                this.setState({
+                    orderSuccessfull : true
+                });
+            }
+            else {
+                alert("Constact Administrator");
+            }
         }
-        else {
-            alert("Constact Administrator");
+        else{
+            alert("Enter all address fields.");
         }
+        
     }
 
     async componentDidMount() {
-        let restaurantId = '1';
+        let emailId = 'default@default.com';
         try {
-            restaurantId = this.props.location.state.restaurantId;
+            emailId = localStorage.getItem('emailId');
         }
         catch (error) {
             console.log(error);
         }
         const request = {
-            restaurantId: restaurantId
+            emailId: emailId
         }
-        const restaurantProfile = await getRestaurantProfileByID(request);
+        const customerProfile = await getCustomerProfileByEmailId(request);
         const totalPrice = (parseFloat(this.props.location.state.cartPrice) + parseFloat(this.props.location.state.cartPrice * 0.1) + parseFloat(this.props.location.state.cartPrice * 0.01)).toFixed(2);
 
-        if (restaurantProfile) {
+        if (customerProfile) {
+            const address = JSON.parse(customerProfile.address);
             this.setState({
-                restaurantName: restaurantProfile.store_name,
-                location: restaurantProfile.store_location,
-                description: (restaurantProfile.description) ? restaurantProfile.description : '',
-                timings: (restaurantProfile.timings) ? restaurantProfile.timings : '',
-                emailId: (restaurantProfile.owner_email) ? restaurantProfile.owner_email : '',
-                phone: (restaurantProfile.phone) ? restaurantProfile.phone : '',
-                street: (restaurantProfile.street) ? restaurantProfile.street : '',
-                state: (restaurantProfile.state) ? restaurantProfile.state : '',
-                country: (restaurantProfile.country) ? restaurantProfile.country : '',
-                pincode: (restaurantProfile.pincode) ? restaurantProfile.pincode : '',
+                street: (address.street) ? address.street : '',
+                city : (address.city) ? address.city : '',
+                state: (address.state) ? address.state : '',
+                country: (address.country) ? address.country : '',
+                pincode: (address.pincode) ? address.pincode : '',
                 dishes: (this.props.location.state.cartDishes) ? this.props.location.state.cartDishes : [],
                 cartPrice: (this.props.location.state.cartPrice) ? parseInt(this.props.location.state.cartPrice) : 0,
                 totalPrice: totalPrice
@@ -113,6 +117,7 @@ class Checkout extends Component {
         return (
             <div className="row">
                 {redirectComponent}
+                < CustomerNavBar />
                 <div className="col-8" style={{ margin: "2% 0 0 2%" }}>
                     <div>
                         <div className="row">
@@ -125,6 +130,12 @@ class Checkout extends Component {
                                     <div className="row">
                                         <div className="col">
                                             <input type="text" className="form-control" placeholder="Street" value={this.state.street} onChange={(e) => this.setState({ street: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div className="row">
+                                        <div className="col">
+                                            <input type="text" className="form-control" placeholder="City" value={this.state.city} onChange={(e) => this.setState({ city: e.target.value })} />
                                         </div>
                                     </div>
                                     <br />

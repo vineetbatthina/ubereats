@@ -17,6 +17,11 @@ export default class CustomerProfile extends Component {
             nickName: '',
             dob: '',
             address: '',
+            state:'',
+            street:'',
+            city:'',
+            country:'',
+            pincode:'',
             profileImg: '',
             noProfileData: false
         }
@@ -35,9 +40,9 @@ export default class CustomerProfile extends Component {
         const request = {
             emailId: emailId
         }
-        const restaurantProfile = await getCustomerProfileByEmailId(request);
-        if (restaurantProfile) {
-            if (restaurantProfile.length === 0) {
+        const customerProfile = await getCustomerProfileByEmailId(request);
+        if (customerProfile) {
+            if (customerProfile.length === 0) {
                 this.setState({
                     emailId: localStorage.getItem('emailId'),
                     phone: '',
@@ -45,6 +50,7 @@ export default class CustomerProfile extends Component {
                     nickName: '',
                     dob: '',
                     street: '',
+                    city:'',
                     state: '',
                     country : '',
                     pincode: '',
@@ -53,17 +59,24 @@ export default class CustomerProfile extends Component {
                 })
             }
             else {
+                if(JSON.parse(customerProfile.address).city){
+                    localStorage.setItem('cust_location',JSON.parse(customerProfile.address).city);
+                }
+                else{
+                    localStorage.setItem('cust_location','');
+                }
                 this.setState({
                     emailId: localStorage.getItem('emailId'),
-                    phone: restaurantProfile[0].phone,
-                    name: restaurantProfile[0].name,
-                    nickName: restaurantProfile[0].nick_name,
-                    dob: restaurantProfile[0].DOB,
-                    street: JSON.parse(restaurantProfile[0].address).street,
-                    state: JSON.parse(restaurantProfile[0].address).state,
-                    country : JSON.parse(restaurantProfile[0].address).country,
-                    pincode: JSON.parse(restaurantProfile[0].address).pincode,
-                    profileImg: restaurantProfile[0].profile_img,
+                    phone: customerProfile.phone,
+                    name: customerProfile.name,
+                    nickName: customerProfile.nick_name,
+                    dob: customerProfile.DOB,
+                    street: JSON.parse(customerProfile.address).street,
+                    city :  JSON.parse(customerProfile.address).city,
+                    state: JSON.parse(customerProfile.address).state,
+                    country : JSON.parse(customerProfile.address).country,
+                    pincode: JSON.parse(customerProfile.address).pincode,
+                    profileImg: customerProfile.profile_img,
                     noProfileData: false
                 })
             }
@@ -78,7 +91,8 @@ export default class CustomerProfile extends Component {
             street : this.state.street,
             state: this.state.state,
             country : this.state.country,
-            pincode : this.state.pincode
+            pincode : this.state.pincode,
+            city :  this.state.city
         }
 
         const request = {
@@ -93,6 +107,12 @@ export default class CustomerProfile extends Component {
 
         if(this.state.noProfileData){
             try{
+                if(address.city){
+                    localStorage.setItem('cust_location',address.city);
+                }
+                else{
+                    localStorage.setItem('cust_location','');
+                }
                 const response = await saveCustomerProfile(request);
                 if(response){
                     document.getElementById('save_messege').innerHTML = 'Successfully Saved your Profile';
@@ -107,6 +127,12 @@ export default class CustomerProfile extends Component {
         }
         else{
             try{
+                if(address.city){
+                    localStorage.setItem('cust_location',address.city);
+                }
+                else{
+                    localStorage.setItem('cust_location','');
+                }
                 const response = await updateCustomerProfile(request);
                 if(response){
                     document.getElementById('save_messege').innerHTML = 'Successfully Updated your Profile';
@@ -151,6 +177,10 @@ export default class CustomerProfile extends Component {
                         <div className="form-group">
                             <label >Street</label>
                             <input type="text" className="form-control" value={this.state.street} onChange={(e) => this.setState({ street: e.target.value })} />
+                        </div>
+                        <div className="form-group">
+                            <label >City</label>
+                            <input type="text" className="form-control" value={this.state.city} onChange={(e) => this.setState({ city: e.target.value })} />
                         </div>
                         <div className="form-group">
                             <label >State</label>

@@ -37,8 +37,8 @@ router.post('/api/saveRestaurantProfile', async (req, res) => {
 
   const restaurantProfile = req.body;
   console.log(restaurantProfile);
-  const update_res = `UPDATE restaurants set store_name = ? ,  store_location = ? , description = ? , timings = ? , phone = ?, street = ?, state = ?, country = ?, pincode = ? where owner_email= ?`
-  await connection.query(update_res, [restaurantProfile.restaurantName, restaurantProfile.location, restaurantProfile.description, restaurantProfile.timings, restaurantProfile.phone, restaurantProfile.street, restaurantProfile.state, restaurantProfile.country, restaurantProfile.pincode, restaurantProfile.emailId], async function (error, results) {
+  const update_res = `UPDATE restaurants set store_name = ? ,  store_location = ? , description = ? , cuisine = ?, timings = ? , delivery_type = ?, phone = ?, street = ?, state = ?, country = ?, pincode = ? where owner_email= ?`
+  await connection.query(update_res, [restaurantProfile.restaurantName, restaurantProfile.location, restaurantProfile.description, restaurantProfile.cuisine, restaurantProfile.timings, restaurantProfile.deliveryType, restaurantProfile.phone, restaurantProfile.street, restaurantProfile.state, restaurantProfile.country, restaurantProfile.pincode, restaurantProfile.emailId], async function (error, results) {
     if (error) {
       console.log(error);
       console.log('Restaurant Profile could not be updated');

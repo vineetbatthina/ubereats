@@ -70,7 +70,13 @@ export default class RestaurantDisplay extends Component {
                 </div>
                 <div className="row">
                     <div className="col">
-                        {this.props.location.state.restaurantDescription}
+                    <i>{this.props.location.state.restaurantDescription}</i>
+                    </div>
+                </div>
+                <br />
+                <div className="row">
+                    <div className="col">
+                        Located at : <b><i>{this.props.location.state.restaurantLocation}</i></b>
                     </div>
                 </div>
                 <br />

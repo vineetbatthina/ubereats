@@ -1,39 +1,73 @@
 import React, { Component } from 'react';
 import CustomerNavBar from './CustomerNavBar';
 import CustomerRestaurantsDisplay from './CustomerRestaurantsDisplay';
-import CustomerFilters from './CustomerFilters';
+import {getCustomerProfileByEmailId} from '../../services/CustomerService';
 
 export default class CustomerDashboard extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            location : ''
+    }
+
+    async componentDidMount(){
+        let emailId = 'default@default.com';
+        try {
+            emailId = localStorage.getItem('emailId');
         }
-
-        this.searchByLocation = this.searchByLocation.bind(this);
-        this.displayRestaurantDetail = this.displayRestaurantDetail.bind(this);
-    }
-
-    searchByLocation(enteredLocation){
-        this.setState({
-            location : enteredLocation,
-            showRestaurant : false
-        })
-    }
-
-    displayRestaurantDetail(restaurantId){
-        console.log(restaurantId);
+        catch (error) {
+            console.log(error);
+        }
+        const request = {
+            emailId: emailId
+        }
+        const customerProfile = await getCustomerProfileByEmailId(request);
+        if (customerProfile) {
+            if (customerProfile.length === 0) {
+                this.setState({
+                    emailId: localStorage.getItem('emailId'),
+                    phone: '',
+                    name: '',
+                    nickName: '',
+                    dob: '',
+                    street: '',
+                    city:'',
+                    state: '',
+                    country : '',
+                    pincode: '',
+                    profileImg: '',
+                    noProfileData: true
+                })
+            }
+            else {
+                if(JSON.parse(customerProfile.address).city){
+                    localStorage.setItem('cust_location',JSON.parse(customerProfile.address).city);
+                }
+                this.setState({
+                    emailId: localStorage.getItem('emailId'),
+                    phone: customerProfile.phone,
+                    name: customerProfile.name,
+                    nickName: customerProfile.nick_name,
+                    dob: customerProfile.DOB,
+                    street: JSON.parse(customerProfile.address).street,
+                    city :  JSON.parse(customerProfile.address).city,
+                    state: JSON.parse(customerProfile.address).state,
+                    country : JSON.parse(customerProfile.address).country,
+                    pincode: JSON.parse(customerProfile.address).pincode,
+                    profileImg: customerProfile.profile_img,
+                    noProfileData: false
+                })
+            }
+        }
     }
 
     render() {
         return (
             <div>
-                < CustomerNavBar searchByLocation={this.searchByLocation}/>
+                < CustomerNavBar />
 
                 <div className="row">
                     <div className="col" style={{marginLeft:'2%'}}>
-                        <CustomerRestaurantsDisplay location={this.state.location} displayRestaurantDetail={this.displayRestaurantDetail}/>
+                        <CustomerRestaurantsDisplay />
                     </div>
                 </div>
             </div>

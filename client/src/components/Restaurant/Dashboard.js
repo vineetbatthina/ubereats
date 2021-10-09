@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import RestaurantNavBar from './RestaurantNavBar';
-import res_default_image from '../../images/landing_page_background.jpg';
+import res_img_0 from '../../images/landing_page_background.jpg';
+import res_img_1 from '../../images/restaurant_profile_1.jpg';
+import res_img_2 from '../../images/restaurant_profile_2.jpg';
+import res_img_3 from '../../images/restaurant_profile_3.jpg';
 import '../../css/Restaurant.css';
 import { getRestaurantProfile } from '../../services/RestaurantService';
 
@@ -54,12 +57,14 @@ export default class Dashboard extends Component {
     }
 
     render() {
+        const res_img_array = [res_img_0,res_img_1,res_img_2,res_img_3];
+        const res_img = res_img_array[Math.floor(Math.random() * res_img_array.length)];
         return (
             <div>
                 <RestaurantNavBar />
                 <div>
                     <div class="text-center">
-                        <img src={res_default_image} className="img-fluid" onError={(e) => { e.target.onerror = null; e.target.src = "../../images/default_dish.jpg" }} />
+                        <img src={res_img} className="img-fluid" onError={(e) => { e.target.onerror = null; e.target.src = "../../images/default_dish.jpg" }} />
                         <div class="caption">
                             <h1>{this.state.restaurantName}</h1>
                             <p>{this.state.description}</p>

@@ -96,7 +96,7 @@ export async function getCustomerProfileByEmailId(emailId) {
         const fetchResponse = await fetch('http://localhost:3080/api/getCustomerProfileByEmailId', requestOptions);
         const data = await fetchResponse.json();
         if(fetchResponse.status===200){
-            profile = data;
+            profile = data[0];
         }
     } catch (e) {
         console.log(e);
@@ -148,4 +148,24 @@ export async function updateCustomerProfile(request) {
         console.log(e);
     }
     return profile;
+}
+
+export async function getRestaurantsBasedonSearch(request) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request)
+    };
+    let restaurants = null;
+    try {
+        const fetchResponse = await fetch('http://localhost:3080/api/getRestaurantsBasedonSearch', requestOptions);
+        const data = await fetchResponse.json();
+        if(fetchResponse.status===200){
+            restaurants = data;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+    return restaurants;
 }

@@ -126,13 +126,13 @@ class LandingPage extends React.Component {
           </div>
           <div hidden={this.state.otherRestaurants.length===0}>
             <div>
-              <h2>Couldn't find restaurants at your place? Explore other restaurants ! </h2>
+              <h2>Our Restaurant Partners </h2>
             </div>
-            <div >
+            <div className="row">
               {
                 this.state.otherRestaurants.map((restaurant) => {
                   return (
-                    <div className="col" key={restaurant.restaurant_id}>
+                    <div className="col-3" key={restaurant.restaurant_id}>
                       <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForGuest" source="guest" />
                     </div>
                   )

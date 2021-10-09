@@ -55,9 +55,15 @@ class CustomerNavBar extends Component {
     }
 
     searchByLocation(event) {
-        if (event.key === 'Enter') {
-            this.props.searchByLocation(this.state.locationSearch);
-        }
+        if(event.key === 'Enter'){
+            localStorage.setItem('location',this.state.locationSearch);
+            if(this.props.changedLocation){
+              this.props.changedLocation(this.state.locationSearch);
+            }
+            else{
+                window.location.href="/";
+            }
+          }
     }
 
     closePopup = (e) => {
@@ -97,7 +103,7 @@ class CustomerNavBar extends Component {
             cartDishes: cartDishes.dishes
         });
     }
-
+    
     render() {
 
         return (
@@ -110,8 +116,8 @@ class CustomerNavBar extends Component {
                     <a href="/">
                         <img alt="Uber Eats Home" role="img" src="https://d3i4yxtzktqr9n.cloudfront.net/web-eats-v2/ee037401cb5d31b23cf780808ee4ec1f.svg" width="146" height="24" />
                     </a>
-                    <input type="text" placeholder="Enter location" value={this.state.locationSearch} onChange={(e) => this.setState({ locationSearch: e.target.value })} className="customer_location_input" onKeyDown={this.searchByLocation}></input>
-                    <input type="text" placeholder="What are you craving" value={this.state.dishSearch} onChange={(e) => this.setState({ dishSearch: e.target.value })} className="food_input" onKeyDown={this.searchByLocation}></input>
+                    {/* <input type="text" placeholder="Enter location" value={this.state.locationSearch} onChange={(e) => this.setState({ locationSearch: e.target.value })} className="customer_location_input" onKeyDown={this.searchByLocation}></input>
+                    <input type="text" placeholder="What are you craving" value={this.state.dishSearch} onChange={(e) => this.setState({ dishSearch: e.target.value })} className="food_input" onKeyDown={this.searchByLocation}></input> */}
                     <button id="cart" onClick={this.onCartClick}><BiCartAlt /> Cart. {this.props.cartCount === 0 ? JSON.parse(localStorage.getItem('cart_dishes')).dishes.length : this.props.cartCount} </button>
                 </div>
                 <div className="container">

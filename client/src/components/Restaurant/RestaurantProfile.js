@@ -22,8 +22,11 @@ export default class RestaurantProfile extends Component {
             pincode: '',
             isDeliveryChecked: false,
             isPickupChecked: false,
+            isVegChecked: false,
+            isNonVegChecked: false,
             saveMessege: true,
-            restaurantImg: ''
+            restaurantImg: '',
+            restaurantImgUrl: ''
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -42,14 +45,25 @@ export default class RestaurantProfile extends Component {
             restaurantImgUrl = response.data.imageUrl;
             console.log(restaurantImgUrl);
         }
+        else{
+            restaurantImgUrl = this.state.restaurantImgUrl;
+        }
 
         let deliveryType = [];
+
+        let dishesType = [];
 
         if (this.state.isDeliveryChecked) {
             deliveryType.push("DELIVERY");
         }
         if (this.state.isPickupChecked) {
             deliveryType.push("PICKUP");
+        }
+        if(this.state.isVegChecked){
+            dishesType.push("VEGAN");
+        }
+        if(this.state.isNonVegChecked){
+            dishesType.push("NONVEG");
         }
 
         const restaurantProfile = {
@@ -61,6 +75,7 @@ export default class RestaurantProfile extends Component {
             emailId: this.state.emailId,
             phone: this.state.phone,
             deliveryType: String(deliveryType),
+            dishesType: String(dishesType),
             street: this.state.street,
             state: this.state.state,
             country: this.state.country,
@@ -95,14 +110,32 @@ export default class RestaurantProfile extends Component {
         if (restaurantProfile) {
             let isDeliveryChecked = false;
             let isPickupChecked = false;
+            let isVegChecked = false;
+            let isNonVegChecked = false;
             if (restaurantProfile.delivery_type) {
                 let delivery_types = restaurantProfile.delivery_type.split(",");
+                
                 delivery_types.map((type) => {
                     if (type === "DELIVERY") {
                         isDeliveryChecked = true;
                     }
                     else {
                         isPickupChecked = true;
+                    }
+                })
+                
+            }
+
+            if (restaurantProfile.dishes_type) {
+                
+                let dishTypes = restaurantProfile.dishes_type.split(",");
+                
+                dishTypes.map((type) => {
+                    if (type === "VEG") {
+                        isVegChecked = true;
+                    }
+                    else if(type === "NONVEG"){
+                        isNonVegChecked = true;
                     }
                 })
             }
@@ -115,7 +148,10 @@ export default class RestaurantProfile extends Component {
                 timings: (restaurantProfile.timings) ? restaurantProfile.timings : '',
                 emailId: localStorage.getItem('emailId'),
                 isDeliveryChecked: isDeliveryChecked,
+                isNonVegChecked: isNonVegChecked,
+                isVegChecked: isVegChecked,
                 isPickupChecked: isPickupChecked,
+                restaurantImgUrl : restaurantProfile.restaurant_img,
                 phone: (restaurantProfile.phone) ? restaurantProfile.phone : '',
                 street: (restaurantProfile.street) ? restaurantProfile.street : '',
                 state: (restaurantProfile.state) ? restaurantProfile.state : '',
@@ -169,11 +205,24 @@ export default class RestaurantProfile extends Component {
                         <br />
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" value="Delivery" checked={this.state.isDeliveryChecked} onChange={() => { this.setState({ isDeliveryChecked: !this.state.isDeliveryChecked }) }} />
-                            <label class="form-check-label" for="inlineCheckbox1">Delivery</label>
+                            <label class="form-check-label" >Delivery</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" value="Pickup" checked={this.state.isPickupChecked} onChange={() => { this.setState({ isPickupChecked: !this.state.isPickupChecked }) }} />
-                            <label class="form-check-label" for="inlineCheckbox2">Pickup</label>
+                            <label class="form-check-label" >Pickup</label>
+                        </div>
+                    </div>
+                    <br />
+                    <div className="form-group">
+                        <label htmlFor="formGroupExampleInput2">Your Restaurant has dishes of </label>
+                        <br />
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" value="Delivery" checked={this.state.isVegChecked} onChange={() => { this.setState({ isVegChecked: !this.state.isVegChecked }) }} />
+                            <label class="form-check-label" >Vegan</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" value="Pickup" checked={this.state.isNonVegChecked} onChange={() => { this.setState({ isNonVegChecked: !this.state.isNonVegChecked }) }} />
+                            <label class="form-check-label" >Non-Vegan</label>
                         </div>
                     </div>
                     <br />

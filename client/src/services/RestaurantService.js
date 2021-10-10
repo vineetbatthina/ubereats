@@ -51,27 +51,6 @@ export async function getRestaurantProfile(request) {
     }
 }
 
-export async function getRestaurantProfileByID(request) {
-
-    let resProfile = null;
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request)
-    };
-    try {
-        const fetchResponse = await fetch('http://localhost:3080/api/getRestaurantProfileById', requestOptions);
-        const data = await fetchResponse.text();
-        if (fetchResponse.status === 200) {
-            resProfile = JSON.parse(data);
-        }
-        return resProfile;
-    } catch (e) {
-        console.log(e);
-        return -1;
-    }
-}
-
 export async function saveRestaurantProfile(restaurantProfile) {
 
     const requestOptions = {

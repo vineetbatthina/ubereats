@@ -20,7 +20,8 @@ export default class RestaurantCard extends Component {
                             restaurantName: this.props.restaurantName,
                             restaurantDescription: this.props.restaurantDescription,
                             restaurantLocation : this.props.restaurantLocation,
-                            source : this.props.source
+                            source : this.props.source,
+                            dishType : this.props.dishType
                         }
                     }}>
                     <img src={this.props.restaurantImg} className="img-thumbnail" onError={(e) => { e.target.onerror = null; e.target.src = "../../images/default_dish.jpg" }} />

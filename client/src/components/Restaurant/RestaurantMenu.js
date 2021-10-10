@@ -25,7 +25,8 @@ export default class RestaurantMenu extends Component {
             currDishIngredients: '',
             currDishCategory: '',
             dishModalVisible: false,
-            dishImg : ''
+            dishImg : '',
+            dishImgUrl:''
         }
 
         this.fetchDishes = this.fetchDishes.bind(this);
@@ -64,6 +65,9 @@ export default class RestaurantMenu extends Component {
             const response = await uploadDishtoS3(imageData);
             dishImgUrl = response.data.imageUrl;
             console.log(dishImgUrl);
+        }
+        else {
+            dishImgUrl = this.state.dishImgUrl;
         }
 
         const dish = {
@@ -164,7 +168,8 @@ export default class RestaurantMenu extends Component {
                                             currDishPrice: dish.dish_price,
                                             currDishIngredients: dish.dish_ingredients,
                                             currDishCategory: dish.dish_category,
-                                            dishModalVisible: true
+                                            dishModalVisible: true,
+                                            dishImgUrl : (dish.dish_img) ? dish.dish_img : ''
                                         })
                                     }}>
                                         <Dish dishName={dish.dish_name} dishDescription={dish.dish_description} dishPrice={dish.dish_price} dishIngredients={dish.dish_ingredients} dishCategory={dish.dish_category} dishImg={dish.dish_img}/>
@@ -183,7 +188,7 @@ export default class RestaurantMenu extends Component {
                             <form onSubmit={this.updateItem} style={{ marginLeft: '3%' }}>
                                 <div className="row">
                                     <div className="col-3">
-                                        Dish Image<input accept="image/*" type="file" className="form-control-file" placeholder="Dish Image Upload" onChange={this.onDishImageChange} required></input>
+                                        Dish Image<input accept="image/*" type="file" className="form-control-file" placeholder="Dish Image Upload" onChange={this.onDishImageChange} ></input>
                                     </div>
                                 </div>
                                 <br />

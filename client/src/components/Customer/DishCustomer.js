@@ -10,18 +10,29 @@ class DishCustomer extends Component {
 
         this.setState({
             openPopup: false,
-            item_quantity: 1
+            item_quantity: 1,
+            showConfirmation: false
         });
 
         this.showPopup = this.showPopup.bind(this);
         this.closePopup = this.closePopup.bind(this);
         this.addDishesToCart = this.addDishesToCart.bind(this);
+        this.confirmYes = this.confirmYes.bind(this);
+        this.closeConfirmation = this.closeConfirmation.bind(this);
     }
 
     showPopup = () => {
-        this.setState({
-            openPopup: true
-        });
+        if ((JSON.parse(localStorage.getItem("cart_dishes")).restaurantId) !== '' && (JSON.parse(localStorage.getItem("cart_dishes")).restaurantId) !== this.props.restaurantId) {
+            this.setState({
+                showConfirmation: true
+            });
+        }
+        else {
+
+            this.setState({
+                openPopup: true
+            });
+        }
     };
 
     closePopup = (e) => {
@@ -40,7 +51,7 @@ class DishCustomer extends Component {
     addDishesToCart = () => {
         let existingCart = JSON.parse(localStorage.getItem("cart_dishes"));
 
-        if ((JSON.parse(localStorage.getItem("cart_dishes")).restaurantId)!==''  && (JSON.parse(localStorage.getItem("cart_dishes")).restaurantId) !== this.props.restaurantId){
+        if ((JSON.parse(localStorage.getItem("cart_dishes")).restaurantId) !== '' && (JSON.parse(localStorage.getItem("cart_dishes")).restaurantId) !== this.props.restaurantId) {
             alert(" Previous Restaurant Dishes are Replaced !!")
             existingCart.restaurantId = '';
             existingCart.dishes = [];
@@ -48,21 +59,21 @@ class DishCustomer extends Component {
         }
 
         let existingDish = false;
-        if(existingCart.dishes.length > 0){
-            existingDish = existingCart.dishes.some( dish => dish.dishId === this.props.dishId);
+        if (existingCart.dishes.length > 0) {
+            existingDish = existingCart.dishes.some(dish => dish.dishId === this.props.dishId);
         }
 
-        if(!existingDish){
+        if (!existingDish) {
             existingCart = JSON.parse(localStorage.getItem("cart_dishes"));
 
             existingCart.dishes.push({
-                dishId : this.props.dishId,
-                dishName : this.props.dishName,
-                dish_quantity : document.getElementById("item_quantity").value,
-                dish_price : this.props.dishPrice,
+                dishId: this.props.dishId,
+                dishName: this.props.dishName,
+                dish_quantity: document.getElementById("item_quantity").value,
+                dish_price: this.props.dishPrice,
             });
             existingCart.restaurantId = this.props.restaurantId;
-            localStorage.setItem("cart_dishes",JSON.stringify(existingCart));
+            localStorage.setItem("cart_dishes", JSON.stringify(existingCart));
             this.setState({
                 openPopup: false,
                 item_quantity: 1
@@ -91,6 +102,27 @@ class DishCustomer extends Component {
         this.props.updateCart(localStorage.getItem("cart_dishes"));
     };
 
+    confirmYes(){
+        let existingCart = JSON.parse(localStorage.getItem("cart_dishes"));
+
+        if ((JSON.parse(localStorage.getItem("cart_dishes")).restaurantId) !== '' && (JSON.parse(localStorage.getItem("cart_dishes")).restaurantId) !== this.props.restaurantId) {
+            existingCart.restaurantId = '';
+            existingCart.dishes = [];
+            localStorage.setItem("cart_dishes", JSON.stringify(existingCart));
+        }
+
+        this.setState({
+            openPopup: true,
+            showConfirmation: false
+        })
+    }
+
+    closeConfirmation(){
+        this.setState({
+            showConfirmation: false
+        })
+    }
+
     render() {
 
         let buttonText = "Add to Cart";
@@ -110,6 +142,10 @@ class DishCustomer extends Component {
         let openPopup = false;
         if (this.state) {
             openPopup = this.state.openPopup;
+        }
+        let showConfirmation = false;
+        if (this.state) {
+            showConfirmation = this.state.showConfirmation;
         }
 
         return (
@@ -152,6 +188,24 @@ class DishCustomer extends Component {
                         </button>
                     </Modal.Footer>
                 </Modal>
+                <Modal show={showConfirmation} onHide={this.closeConfirmation} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Confirmation</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <center>
+                            <p>Do you wish to replace the previous restaurant's dishes with this new restaurant dishes ? </p>
+                        </center>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button onClick={this.confirmYes}>
+                            Yes
+                        </button>
+                        <button onClick={this.closeConfirmation}>
+                            No
+                        </button>
+                    </Modal.Footer>
+                </Modal>
             </div>
 
         );
@@ -164,4 +218,4 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 
-export default  connect(null, mapDispatchToProps)(DishCustomer);
+export default connect(null, mapDispatchToProps)(DishCustomer);

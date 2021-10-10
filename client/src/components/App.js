@@ -15,6 +15,7 @@ import CustomerOrders from './Customer/Orders';
 import RestaurantProfile from './Restaurant/RestaurantProfile';
 import RestaurantMenu from './Restaurant/RestaurantMenu';
 import RestaurantOrders from './Restaurant/Orders';
+import CustomerFavourites from './Customer/CustomerFavourites';
 
 class App extends React.Component {
   render() {
@@ -30,6 +31,7 @@ class App extends React.Component {
           <RestaurantPrivateRoute exact path='/restaurantMenu' component={RestaurantMenu} />
           <RestaurantPrivateRoute exact path='/restaurantOrders' component={RestaurantOrders} />
           <CustomerPrivateRoute exact path='/custdashboard' component={CustomerDashboard} />
+          <CustomerPrivateRoute exact path='/favourites' component={CustomerFavourites} />
           <CustomerPrivateRoute exact path='/restaurantDisplayForCustomer' component={RestaurantDisplay} />
           <CustomerPrivateRoute exact path='/checkout' component={Checkout} />
           <CustomerPrivateRoute exact path='/customerProfile' component={CustomerProfile} />

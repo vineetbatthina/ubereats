@@ -65,7 +65,7 @@ export default class Dashboard extends Component {
             <div>
                 <RestaurantNavBar />
                 <div>
-                    <div class="text-center">
+                    <div className="text-center">
                         <img src={this.state.restaurantImgUrl} className="img-fluid" onError={(e) => { e.target.onerror = null; e.target.src = "../../images/default_dish.jpg" }} />
                         <div class="caption">
                             <h1>{this.state.restaurantName}</h1>

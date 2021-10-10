@@ -164,4 +164,65 @@ router.post('/api/getRestaurantsBasedonSearch', async (req, res) => {
   });
 });
 
+router.post('/api/getFavourites', async (req, res)=>{
+  const emailId = req.body.emailId;
+  const select_favourites = `SELECT favourites from customer_profiles where email_id = ?`;
+  await connection.query(select_favourites, [emailId], async function (error, results) {
+    if (error) {
+      console.log("Not Successfull");
+      res.send(JSON.stringify(error));
+    }
+    else {
+      console.log('Successfully Retrieved the favourites for the customer');
+      res.send(JSON.stringify(results));
+    }
+  });
+});
+
+router.post('/api/updateFavourites', async (req, res)=>{
+  const emailId = req.body.emailId;
+  const updatedFavourites = req.body.updatedFavourites;
+  const select_favourites = `UPDATE customer_profiles set favourites = ?  where email_id = ?`;
+  await connection.query(select_favourites, [updatedFavourites,emailId], async function (error, results) {
+    if (error) {
+      console.log("Not Successfull");
+      res.send(false);
+    }
+    else {
+      console.log('Successfully Updated the customer favourites');
+      res.send(true);
+    }
+  });
+});
+
+router.post('/api/getRestaurantsBasedonIds', async (req, res)=>{
+
+  const select_restaurants = `SELECT * FROM restaurants where restaurant_id IN ?`;
+  await connection.query(select_restaurants, [req.body.searchString], async function (error, results) {
+    if (error) {
+      console.log("Not Successfull");
+      res.send(JSON.stringify(error));
+    }
+    else {
+      console.log('Successfully Retrieved the restaurants based on search string the customer profile');
+      res.send(JSON.stringify(results));
+    }
+  });
+});
+
+router.post('/api/getRestaurantProfileByID', async (req, res)=> {
+
+  const select_restaurants = `SELECT * FROM restaurants where restaurant_id = ?`;
+  await connection.query(select_restaurants, [req.body.resId], async function (error, results) {
+    if (error) {
+      console.log("Not Successfull");
+      res.send(JSON.stringify(error));
+    }
+    else {
+      console.log('Successfully Retrieved the restaurants based on search string the customer profile');
+      res.send(JSON.stringify(results));
+    }
+  });
+});
+
 module.exports = router;

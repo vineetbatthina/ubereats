@@ -1,7 +1,7 @@
 var mysql = require('mysql');
 var constants = require("./config.json");
 
-var connection = mysql.createConnection({
+var connection = mysql.createPool({
     host: constants.DB.host,
     user: constants.DB.username,
     password: constants.DB.password,
@@ -9,7 +9,7 @@ var connection = mysql.createConnection({
     database: constants.DB.database
   });
   
-  connection.connect((err) =>{
+  connection.getConnection((err) =>{
     if(err){
       throw 'Error Occured while creating pool' + err;
     }

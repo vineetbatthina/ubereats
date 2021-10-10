@@ -182,3 +182,49 @@ export async function uploadProfilePicturetoS3(imageData){
     }
     return responseUrl;
 }
+
+export async function getFavourites(request){
+
+    let currFavourites = [];
+    try{
+        currFavourites = await axios.post('http://localhost:3080/api/getFavourites',request);
+        if(currFavourites.data){
+            console.log("Current Favourite Dishes are :" + currFavourites.data[0].favourites);
+            return currFavourites.data[0].favourites;
+        }
+    }
+    catch(e){
+        console.log(e);
+    }
+    return currFavourites;
+
+}
+
+export async function updateFavourites(request){
+
+    try{
+        const result= await axios.post('http://localhost:3080/api/updateFavourites',request);
+        console.log("Current Favourite Dishes are :" + result);
+        return result;
+    }
+    catch(e){
+        console.log(e);
+        return false;
+    }
+}
+
+export async function getRestaurantProfileByID(request) {
+
+    let restaurant = null;
+    try{
+        restaurant = await axios.post('http://localhost:3080/api/getRestaurantProfileByID',request);
+        console.log("Current Restaurant is :" + restaurant.data[0]);
+        if(restaurant){
+            return restaurant.data[0];
+        }
+    }
+    catch(e){
+        console.log(e);
+    }
+    return restaurant;
+}

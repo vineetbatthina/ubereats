@@ -50,6 +50,9 @@ class CustomerSideBar extends Component {
                     <Link to="/custDashboard" style={{ color: 'inherit' }} >
                         <button className="cust_sidebar_btns"> Dashboard </button>
                     </Link>
+                    <Link to="/favourites" style={{ color: 'inherit' }} >
+                        <button className="cust_sidebar_btns"> Favourites </button>
+                    </Link>
                     <Link to="/customerProfile" style={{ color: 'inherit' }} >
                         <button className="cust_sidebar_btns"> Profile </button>
                     </Link>

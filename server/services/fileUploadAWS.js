@@ -5,22 +5,13 @@ const multerS3 = require('multer-s3');
 const bucketName = "ubereatsdb";
 
 aws.config.update({
-  accessKeyId: 'AKIA6BS2OQIWYVWXB345',
-  secretAccessKey: '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',
+  accessKeyId: 'AKIA6BS2OQIWUPIG3B27',
+  secretAccessKey: '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',
   region: 'us-east-2',
 });
 
-const isImage = (req,file,callbck)=>{
-    if(file.mimetype.startsWith('image')){
-      console.log('Call back');
-      callbck(null,true)
-    }else{
-        callbck(new Error('Only Image is allowed'))
-    }
-}
 
 var upload = multer({
-    // fileFilter : isImage,
     storage: multerS3({
       s3: new aws.S3(),
       bucket: bucketName,

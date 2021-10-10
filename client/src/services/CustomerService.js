@@ -1,4 +1,5 @@
 import axios from 'axios';
+import serverUrl from '../utils/clientconfig';
 
 export async function getLocalRestaurants(locationJson) {
 
@@ -9,7 +10,7 @@ export async function getLocalRestaurants(locationJson) {
     };
     console.log("Client Side User Sent:"+ locationJson);
     try {
-        const fetchResponse = await fetch('http://localhost:3080/api/getLocalRestaurants', requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/api/getLocalRestaurants`, requestOptions);
         let data = await fetchResponse;
         if(data.status === 200 || data.status === 301){
             return data.status;
@@ -32,7 +33,7 @@ export async function getDishesbyResId(restaurantId) {
     };
     let dishes = null;
     try {
-        const fetchResponse = await fetch('http://localhost:3080/api/getDishesbyResId', requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/api/getDishesbyResId`, requestOptions);
         const data = await fetchResponse.json();
         if(fetchResponse.status===200){
             dishes = data;
@@ -52,7 +53,7 @@ export async function sendOrders(order) {
     };
     console.log("Client Side order sent:"+ order);
     try {
-        const fetchResponse = await fetch('http://localhost:3080/api/sendOrders', requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/api/sendOrders`, requestOptions);
         let data = await fetchResponse;
         if(data.status === 200){
             return true;
@@ -75,7 +76,7 @@ export async function getOrdersByCustEmail(emailId) {
     };
     let orders = null;
     try {
-        const fetchResponse = await fetch('http://localhost:3080/api/getOrdersByCustEmail', requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/api/getOrdersByCustEmail`, requestOptions);
         const data = await fetchResponse.json();
         if(fetchResponse.status===200){
             orders = data;
@@ -95,7 +96,7 @@ export async function getCustomerProfileByEmailId(emailId) {
     };
     let profile = null;
     try {
-        const fetchResponse = await fetch('http://localhost:3080/api/getCustomerProfileByEmailId', requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/api/getCustomerProfileByEmailId`, requestOptions);
         const data = await fetchResponse.json();
         if(fetchResponse.status===200){
             profile = data[0];
@@ -115,7 +116,7 @@ export async function saveCustomerProfile(request) {
     };
     let profile = null;
     try {
-        const fetchResponse = await fetch('http://localhost:3080/api/saveCustomerProfile', requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/api/saveCustomerProfile`, requestOptions);
         let data = await fetchResponse;
         if(data.status === 200){
             return true;
@@ -138,7 +139,7 @@ export async function updateCustomerProfile(request) {
     };
     let profile = null;
     try {
-        const fetchResponse = await fetch('http://localhost:3080/api/updateCustomerProfile', requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/api/updateCustomerProfile`, requestOptions);
         let data = await fetchResponse;
         if(data.status === 200){
             return true;
@@ -161,7 +162,7 @@ export async function getRestaurantsBasedonSearch(request) {
     };
     let restaurants = null;
     try {
-        const fetchResponse = await fetch('http://localhost:3080/api/getRestaurantsBasedonSearch', requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/api/getRestaurantsBasedonSearch`, requestOptions);
         const data = await fetchResponse.json();
         if(fetchResponse.status===200){
             restaurants = data;
@@ -175,7 +176,7 @@ export async function getRestaurantsBasedonSearch(request) {
 export async function uploadProfilePicturetoS3(imageData){
     let responseUrl = '';
     try {
-        responseUrl = await axios.post('http://localhost:3080/api/imageUpload/customerProfile', imageData);
+        responseUrl = await axios.post(`${serverUrl}/api/imageUpload/customerProfile`, imageData);
         console.log(responseUrl);
     } catch (e) {
         console.log(e);
@@ -187,7 +188,7 @@ export async function getFavourites(request){
 
     let currFavourites = [];
     try{
-        currFavourites = await axios.post('http://localhost:3080/api/getFavourites',request);
+        currFavourites = await axios.post(`${serverUrl}/api/getFavourites`,request);
         if(currFavourites.data){
             console.log("Current Favourite Dishes are :" + currFavourites.data[0].favourites);
             return currFavourites.data[0].favourites;
@@ -203,7 +204,7 @@ export async function getFavourites(request){
 export async function updateFavourites(request){
 
     try{
-        const result= await axios.post('http://localhost:3080/api/updateFavourites',request);
+        const result= await axios.post(`${serverUrl}/api/updateFavourites`,request);
         console.log("Current Favourite Dishes are :" + result);
         return result;
     }
@@ -217,7 +218,7 @@ export async function getRestaurantProfileByID(request) {
 
     let restaurant = null;
     try{
-        restaurant = await axios.post('http://localhost:3080/api/getRestaurantProfileByID',request);
+        restaurant = await axios.post(`${serverUrl}/api/getRestaurantProfileByID`,request);
         console.log("Current Restaurant is :" + restaurant.data[0]);
         if(restaurant){
             return restaurant.data[0];

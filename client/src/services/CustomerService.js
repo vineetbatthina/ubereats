@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export async function getLocalRestaurants(locationJson) {
 
     const requestOptions = {
@@ -168,4 +170,15 @@ export async function getRestaurantsBasedonSearch(request) {
         console.log(e);
     }
     return restaurants;
+}
+
+export async function uploadProfilePicturetoS3(imageData){
+    let responseUrl = '';
+    try {
+        responseUrl = await axios.post('http://localhost:3080/api/imageUpload/customerProfile', imageData);
+        console.log(responseUrl);
+    } catch (e) {
+        console.log(e);
+    }
+    return responseUrl;
 }

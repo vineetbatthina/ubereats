@@ -17,6 +17,7 @@ export default class Dashboard extends Component {
             restaurantName: '',
             location: '',
             description: '',
+            restaurantImgUrl: '',
             timings: '',
             emailId: '',
             phone: '',
@@ -45,6 +46,7 @@ export default class Dashboard extends Component {
                 restaurantName: restaurantProfile.store_name,
                 location: restaurantProfile.store_location,
                 description: (restaurantProfile.description) ? restaurantProfile.description : '',
+                restaurantImgUrl : (restaurantProfile.restaurant_img) ? restaurantProfile.restaurant_img : '',
                 timings: (restaurantProfile.timings) ? restaurantProfile.timings : '',
                 emailId: localStorage.getItem('emailId'),
                 phone: (restaurantProfile.phone) ? restaurantProfile.phone : '',
@@ -64,7 +66,7 @@ export default class Dashboard extends Component {
                 <RestaurantNavBar />
                 <div>
                     <div class="text-center">
-                        <img src={res_img} className="img-fluid" onError={(e) => { e.target.onerror = null; e.target.src = "../../images/default_dish.jpg" }} />
+                        <img src={this.state.restaurantImgUrl} className="img-fluid" onError={(e) => { e.target.onerror = null; e.target.src = "../../images/default_dish.jpg" }} />
                         <div class="caption">
                             <h1>{this.state.restaurantName}</h1>
                             <p>{this.state.description}</p>

@@ -117,7 +117,7 @@ class LandingPage extends React.Component {
                 this.state.nearByRestaurants.map((restaurant) => {
                   return (
                     <div className="col" key={restaurant.restaurant_id}>
-                      <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForGuest" source="guest" />
+                      <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForGuest" source="guest" />
                     </div>
                   )
                 })
@@ -133,7 +133,7 @@ class LandingPage extends React.Component {
                 this.state.otherRestaurants.map((restaurant) => {
                   return (
                     <div className="col-3" key={restaurant.restaurant_id}>
-                      <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForGuest" source="guest" />
+                      <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForGuest" source="guest" />
                     </div>
                   )
                 })

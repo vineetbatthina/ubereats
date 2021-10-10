@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import '../../css/Generic.css';
 import CustomerNavBar from '../Customer/CustomerNavBar';
 import { getCustomerProfileByEmailId } from '../../services/CustomerService';
-import {saveCustomerProfile} from '../../services/CustomerService';
-import {updateCustomerProfile} from '../../services/CustomerService';
+import { saveCustomerProfile, updateCustomerProfile, uploadProfilePicturetoS3 } from '../../services/CustomerService';
 
 export default class CustomerProfile extends Component {
 
@@ -17,16 +16,19 @@ export default class CustomerProfile extends Component {
             nickName: '',
             dob: '',
             address: '',
-            state:'',
-            street:'',
-            city:'',
-            country:'',
-            pincode:'',
+            state: '',
+            street: '',
+            city: '',
+            country: '',
+            pincode: '',
             profileImg: '',
-            noProfileData: false
+            noProfileData: false,
+            profilePicture : '',
+            profilePictureUrl:''
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.onProfilePictureChange = this.onProfilePictureChange.bind(this);
     }
 
     async componentDidMount() {
@@ -42,28 +44,15 @@ export default class CustomerProfile extends Component {
         }
         const customerProfile = await getCustomerProfileByEmailId(request);
         if (customerProfile) {
-            if (customerProfile.length === 0) {
-                this.setState({
-                    emailId: localStorage.getItem('emailId'),
-                    phone: '',
-                    name: '',
-                    nickName: '',
-                    dob: '',
-                    street: '',
-                    city:'',
-                    state: '',
-                    country : '',
-                    pincode: '',
-                    profileImg: '',
-                    noProfileData: true
-                })
-            }
-            else {
-                if(JSON.parse(customerProfile.address).city){
-                    localStorage.setItem('cust_location',JSON.parse(customerProfile.address).city);
+                let profilePictureUrl = '';
+                if (JSON.parse(customerProfile.address).city) {
+                    localStorage.setItem('cust_location', JSON.parse(customerProfile.address).city);
                 }
-                else{
-                    localStorage.setItem('cust_location','');
+                else {
+                    localStorage.setItem('cust_location', '');
+                }
+                if(customerProfile.profile_img){
+                    profilePictureUrl = customerProfile.profile_img
                 }
                 this.setState({
                     emailId: localStorage.getItem('emailId'),
@@ -72,82 +61,115 @@ export default class CustomerProfile extends Component {
                     nickName: customerProfile.nick_name,
                     dob: customerProfile.DOB,
                     street: JSON.parse(customerProfile.address).street,
-                    city :  JSON.parse(customerProfile.address).city,
+                    city: JSON.parse(customerProfile.address).city,
                     state: JSON.parse(customerProfile.address).state,
-                    country : JSON.parse(customerProfile.address).country,
+                    country: JSON.parse(customerProfile.address).country,
                     pincode: JSON.parse(customerProfile.address).pincode,
-                    profileImg: customerProfile.profile_img,
+                    profilePictureUrl : profilePictureUrl,
                     noProfileData: false
                 })
-            }
+            
+        }
+        else{
+            this.setState({
+                emailId: localStorage.getItem('emailId'),
+                phone: '',
+                name: '',
+                nickName: '',
+                dob: '',
+                street: '',
+                city: '',
+                state: '',
+                country: '',
+                pincode: '',
+                profileImg: '',
+                noProfileData: true
+            })
         }
     }
 
-    async handleSubmit(event){
+    async handleSubmit(event) {
 
         event.preventDefault();
 
+        let profilePictureUrl = '';
+
+        if (this.state.profilePicture) {
+            const imageData = new FormData();
+            imageData.append('image', this.state.profilePicture);
+            const response = await uploadProfilePicturetoS3(imageData);
+            profilePictureUrl = response.data.imageUrl;
+            console.log(profilePictureUrl);
+        }
+
         const address = {
-            street : this.state.street,
+            street: this.state.street,
             state: this.state.state,
-            country : this.state.country,
-            pincode : this.state.pincode,
-            city :  this.state.city
+            country: this.state.country,
+            pincode: this.state.pincode,
+            city: this.state.city
         }
 
         const request = {
-            emailId : this.state.emailId,
-            phone : this.state.phone,
-            name : this.state.name,
-            nickName :  this.state.nickName,
+            emailId: this.state.emailId,
+            phone: this.state.phone,
+            name: this.state.name,
+            nickName: this.state.nickName,
             dob: this.state.dob,
-            address : JSON.stringify(address),
-            profileImg : this.state.profile_img
+            address: JSON.stringify(address),
+            profilePictureUrl: profilePictureUrl
         }
 
-        if(this.state.noProfileData){
-            try{
-                if(address.city){
-                    localStorage.setItem('cust_location',address.city);
+        if (this.state.noProfileData) {
+            try {
+                if (address.city) {
+                    localStorage.setItem('cust_location', address.city);
                 }
-                else{
-                    localStorage.setItem('cust_location','');
+                else {
+                    localStorage.setItem('cust_location', '');
                 }
                 const response = await saveCustomerProfile(request);
-                if(response){
+                if (response) {
                     document.getElementById('save_messege').innerHTML = 'Successfully Saved your Profile';
                 }
-                else{
+                else {
                     document.getElementById('save_messege').innerHTML = 'Error Saving Profile. Please try after sometime';
                 }
             }
-            catch(error){
+            catch (error) {
                 console.log(error);
             }
         }
-        else{
-            try{
-                if(address.city){
-                    localStorage.setItem('cust_location',address.city);
+        else {
+            try {
+                if (address.city) {
+                    localStorage.setItem('cust_location', address.city);
                 }
-                else{
-                    localStorage.setItem('cust_location','');
+                else {
+                    localStorage.setItem('cust_location', '');
                 }
                 const response = await updateCustomerProfile(request);
-                if(response){
+                if (response) {
                     document.getElementById('save_messege').innerHTML = 'Successfully Updated your Profile';
                 }
-                else{
+                else {
                     document.getElementById('save_messege').innerHTML = 'Error Saving Profile. Please try after sometime';
                 }
             }
-            catch(error){
+            catch (error) {
                 console.log(error);
             }
         }
-        
+
 
     }
+
+    onProfilePictureChange(event){
+        const file = event.target.files[0];
+        this.setState({
+            profilePicture : file
+        })
+      };
 
     render() {
         return (
@@ -156,24 +178,30 @@ export default class CustomerProfile extends Component {
                 < CustomerNavBar searchByLocation={this.searchByLocation} />
                 <div className="container">
                     <form>
-                    <h2>Profile</h2>
-                    <div className="form-group">
+                        <h2>Profile</h2>
+                        <img src={this.state.profilePictureUrl} className="img-thumbnail" style={{width:'10%'}} hidden={this.state.profilePictureUrl===''}></img>
+                        <div className="form-group">
                             <label >Name</label>
-                            <input type="text" className="form-control" value={this.state.name}  onChange={(e) => this.setState({ name: e.target.value })} />
+                            <input type="text" className="form-control" value={this.state.name} onChange={(e) => this.setState({ name: e.target.value })} />
                         </div>
                         <div className="form-group">
                             <label >Nick Name</label>
-                            <input type="text" className="form-control" value={this.state.nickName}  onChange={(e) => this.setState({ nickName: e.target.value })} />
+                            <input type="text" className="form-control" value={this.state.nickName} onChange={(e) => this.setState({ nickName: e.target.value })} />
                         </div>
                         <div className="form-group">
                             <label >D.O.B</label>
                             <input type="text" className="form-control" value={this.state.dob} onChange={(e) => this.setState({ dob: e.target.value })} />
                         </div>
-                        
                         <br/>
-                        <hr/>
+                        <div className="form-group">
+                            <div className="col-3">
+                                Profile Image<input accept="image/*" type="file" className="form-control-file" placeholder="Upload your Profile Picture" onChange={this.onProfilePictureChange}></input>
+                            </div>
+                        </div>
+                        <br />
+                        <hr />
                         <h4>Address</h4>
-                        <br/>
+                        <br />
                         <div className="form-group">
                             <label >Street</label>
                             <input type="text" className="form-control" value={this.state.street} onChange={(e) => this.setState({ street: e.target.value })} />
@@ -198,7 +226,7 @@ export default class CustomerProfile extends Component {
                         <br />
                         <hr />
                         <h4>Contact Information</h4>
-                        <br/>
+                        <br />
                         <div className="form-group">
                             <label >Email Id</label>
                             <input type="text" className="form-control" value={this.state.emailId} readOnly />
@@ -207,7 +235,7 @@ export default class CustomerProfile extends Component {
                             <label >Phone</label>
                             <input type="text" className="form-control" value={this.state.phone} onChange={(e) => this.setState({ phone: e.target.value })} />
                         </div>
-                        
+
                         <br />
                         <div className="row">
                             <div className="col-1">

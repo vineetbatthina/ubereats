@@ -137,7 +137,7 @@ router.post('/api/saveCustomerProfile', async (req, res) => {
 
 router.post('/api/updateCustomerProfile', async (req, res) => {
   const insert_default_user_profile_sql = `update customer_profiles set email_id = ?, phone = ?,  name = ? ,  nick_name = ?,  DOB = ? ,  address = ?,  profile_img = ? where email_id = ?`
-  await connection.query(insert_default_user_profile_sql, [req.body.emailId,req.body.phone,req.body.name,req.body.nickName,req.body.dob,req.body.address,req.body.profileImg,req.body.emailId], async function (error, results) {
+  await connection.query(insert_default_user_profile_sql, [req.body.emailId,req.body.phone,req.body.name,req.body.nickName,req.body.dob,req.body.address,req.body.profilePictureUrl,req.body.emailId], async function (error, results) {
     if (error) {
       console.log("Not Successfull");
       res.send(JSON.stringify(error));

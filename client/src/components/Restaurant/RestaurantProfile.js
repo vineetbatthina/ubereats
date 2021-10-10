@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import '../../css/Generic.css';
-import { getRestaurantProfile, saveRestaurantProfile } from '../../services/RestaurantService';
+import { getRestaurantProfile, saveRestaurantProfile, uploadRestaurantImgtoS3 } from '../../services/RestaurantService';
 import RestaurantNavBar from './RestaurantNavBar';
 
 export default class RestaurantProfile extends Component {
@@ -12,7 +12,7 @@ export default class RestaurantProfile extends Component {
             restaurantName: '',
             location: '',
             description: '',
-            cuisine : '',
+            cuisine: '',
             timings: '',
             emailId: '',
             phone: '',
@@ -22,21 +22,33 @@ export default class RestaurantProfile extends Component {
             pincode: '',
             isDeliveryChecked: false,
             isPickupChecked: false,
-            saveMessege: true
+            saveMessege: true,
+            restaurantImg: ''
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.onRestaurantImageChange = this.onRestaurantImageChange.bind(this);
     }
 
     async handleSubmit(event) {
         event.preventDefault();
 
+        let restaurantImgUrl = '';
+
+        if (this.state.restaurantImg) {
+            const imageData = new FormData();
+            imageData.append('image', this.state.restaurantImg);
+            const response = await uploadRestaurantImgtoS3(imageData);
+            restaurantImgUrl = response.data.imageUrl;
+            console.log(restaurantImgUrl);
+        }
+
         let deliveryType = [];
 
-        if(this.state.isDeliveryChecked){
+        if (this.state.isDeliveryChecked) {
             deliveryType.push("DELIVERY");
         }
-        if(this.state.isPickupChecked){
+        if (this.state.isPickupChecked) {
             deliveryType.push("PICKUP");
         }
 
@@ -44,14 +56,15 @@ export default class RestaurantProfile extends Component {
             restaurantName: this.state.restaurantName,
             location: this.state.location,
             description: this.state.description,
-            cuisine : this.state.cuisine,
+            cuisine: this.state.cuisine,
             timings: this.state.timings,
             emailId: this.state.emailId,
             phone: this.state.phone,
-            deliveryType : String(deliveryType),
+            deliveryType: String(deliveryType),
             street: this.state.street,
             state: this.state.state,
             country: this.state.country,
+            restaurantImgUrl : restaurantImgUrl,
             pincode: parseInt(this.state.pincode)
         };
         const response = await saveRestaurantProfile(restaurantProfile);
@@ -82,13 +95,13 @@ export default class RestaurantProfile extends Component {
         if (restaurantProfile) {
             let isDeliveryChecked = false;
             let isPickupChecked = false;
-            if(restaurantProfile.delivery_type){
+            if (restaurantProfile.delivery_type) {
                 let delivery_types = restaurantProfile.delivery_type.split(",");
-                delivery_types.map((type)=>{
-                    if(type === "DELIVERY"){
+                delivery_types.map((type) => {
+                    if (type === "DELIVERY") {
                         isDeliveryChecked = true;
                     }
-                    else{
+                    else {
                         isPickupChecked = true;
                     }
                 })
@@ -98,11 +111,11 @@ export default class RestaurantProfile extends Component {
                 restaurantName: restaurantProfile.store_name,
                 location: restaurantProfile.store_location,
                 description: (restaurantProfile.description) ? restaurantProfile.description : '',
-                cuisine : (restaurantProfile.cuisine) ? restaurantProfile.cuisine : '',
+                cuisine: (restaurantProfile.cuisine) ? restaurantProfile.cuisine : '',
                 timings: (restaurantProfile.timings) ? restaurantProfile.timings : '',
                 emailId: localStorage.getItem('emailId'),
-                isDeliveryChecked : isDeliveryChecked,
-                isPickupChecked : isPickupChecked,
+                isDeliveryChecked: isDeliveryChecked,
+                isPickupChecked: isPickupChecked,
                 phone: (restaurantProfile.phone) ? restaurantProfile.phone : '',
                 street: (restaurantProfile.street) ? restaurantProfile.street : '',
                 state: (restaurantProfile.state) ? restaurantProfile.state : '',
@@ -112,6 +125,13 @@ export default class RestaurantProfile extends Component {
             console.log(this.setState);
         }
     }
+
+    onRestaurantImageChange(event){
+        const file = event.target.files[0];
+        this.setState({
+            restaurantImg : file
+        })
+      };
 
     render() {
         return (
@@ -131,6 +151,11 @@ export default class RestaurantProfile extends Component {
                         <textarea className="form-control" rows="3" value={this.state.description} onChange={(e) => this.setState({ description: e.target.value })}></textarea>
                     </div>
                     <div className="form-group">
+                        <div className="col-3">
+                            Restaurant Image<input accept="image/*" type="file" className="form-control-file" placeholder="Upload your Restaurant Image" onChange={this.onRestaurantImageChange}></input>
+                        </div>
+                    </div>
+                    <div className="form-group">
                         <label htmlFor="formGroupExampleInput2">Cuisine</label>
                         <input type="text" className="form-control" value={this.state.cuisine} onChange={(e) => this.setState({ cuisine: e.target.value })} />
                     </div>
@@ -138,20 +163,20 @@ export default class RestaurantProfile extends Component {
                         <label htmlFor="formGroupExampleInput2">Timings</label>
                         <input type="text" className="form-control" value={this.state.timings} onChange={(e) => this.setState({ timings: e.target.value })} />
                     </div>
-                    <br/>
+                    <br />
                     <div className="form-group">
                         <label htmlFor="formGroupExampleInput2">Type of Delivery</label>
-                        <br/>
+                        <br />
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" value="Delivery" checked={this.state.isDeliveryChecked} onChange={ () => {this.setState({isDeliveryChecked: !this.state.isDeliveryChecked})}}/>
+                            <input class="form-check-input" type="checkbox" value="Delivery" checked={this.state.isDeliveryChecked} onChange={() => { this.setState({ isDeliveryChecked: !this.state.isDeliveryChecked }) }} />
                             <label class="form-check-label" for="inlineCheckbox1">Delivery</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" value="Pickup" checked={this.state.isPickupChecked} onChange={ () => {this.setState({isPickupChecked : !this.state.isPickupChecked})}}/>
+                            <input class="form-check-input" type="checkbox" value="Pickup" checked={this.state.isPickupChecked} onChange={() => { this.setState({ isPickupChecked: !this.state.isPickupChecked }) }} />
                             <label class="form-check-label" for="inlineCheckbox2">Pickup</label>
                         </div>
                     </div>
-                    <br/>
+                    <br />
                     <div className="form-group">
                         <label htmlFor="formGroupExampleInput2">Address</label>
                         <div className="row">

@@ -91,8 +91,8 @@ export default class CustomerRestaurantsDisplay extends Component {
                         {
                             this.state.locationRestaurants.map((restaurant) => {
                                 return (
-                                    <div className="col" key={restaurant.restaurant_id}>
-                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForCustomer" source="customer" />
+                                    <div className="col-3" key={restaurant.restaurant_id}>
+                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForCustomer" source="customer" />
                                     </div>
                                 )
                             })
@@ -107,8 +107,8 @@ export default class CustomerRestaurantsDisplay extends Component {
                         {
                             this.state.searchedRestaurants.map((restaurant) => {
                                 return (
-                                    <div className="col" key={restaurant.restaurant_id}>
-                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForCustomer" source="customer" />
+                                    <div className="col-3" key={restaurant.restaurant_id}>
+                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForCustomer" source="customer" />
                                     </div>
                                 )
                             })
@@ -125,7 +125,7 @@ export default class CustomerRestaurantsDisplay extends Component {
                             this.state.restaurants.map((restaurant) => {
                                 return (
                                     <div className="col-3" key={restaurant.restaurant_id}>
-                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForCustomer" source="customer" />
+                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForCustomer" source="customer" />
                                     </div>
                                 )
                             })

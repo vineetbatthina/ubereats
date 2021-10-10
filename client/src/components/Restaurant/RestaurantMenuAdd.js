@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { saveDish } from "../../services/RestaurantService";
+import {uploadDishtoS3} from "../../services/UserService";
 
 export default class RestaurantMenuAdd extends Component {
 
@@ -7,34 +8,44 @@ export default class RestaurantMenuAdd extends Component {
         super(props);
 
         this.state = {
-            newDishImage: null,
             dishName : '',
             dishDescription: '',
             dishPrice: '',
             dishIngredients: '',
             dishCategory: '',
-            dishMessege: ''
+            dishMessege: '',
+            dishImg : '',
         }
 
-        this.saveItem = this.saveItem.bind(this);
+        this.addDish = this.addDish.bind(this);
     }
 
-    async saveItem(event) {
+    async addDish(event) {
         event.preventDefault();
+
+        let dishImgUrl = '';
+
+        if (this.state.dishImg) {
+            const imageData = new FormData();
+            imageData.append('image', this.state.dishImg);
+            const response = await uploadDishtoS3(imageData);
+            dishImgUrl = response.data.imageUrl;
+            console.log(dishImgUrl);
+        }
+
         const dish = {
-            newDishImage: (this.state.newDishImage) ? this.state.newDishImage : '',
             dishName : this.state.dishName,
             dishDescription: this.state.dishDescription,
             dishPrice: this.state.dishPrice,
             dishIngredients: this.state.dishIngredients,
             dishCategory: this.state.dishCategory,
+            dishImgUrl: dishImgUrl,
             emailId: localStorage.getItem('emailId')
         }
 
         const response = await saveDish(dish);
         if (response === 200) {
             this.setState({
-                newDishImage: null,
                 dishName : '',
                 dishDescription: '',
                 dishPrice: '',
@@ -45,7 +56,6 @@ export default class RestaurantMenuAdd extends Component {
         }
         else {
             this.setState({
-                newDishImage: null,
                 dishName : '',
                 dishDescription: '',
                 dishPrice: '',
@@ -58,13 +68,20 @@ export default class RestaurantMenuAdd extends Component {
         this.props.fetchDishes();
     }
 
+    onDishImageChange = (event) => {
+        const file = event.target.files[0];
+        this.setState({
+            dishImg : file
+        })
+      };
+
     render() {
         return (
             <div>
-                <form onSubmit={this.saveItem} style={{marginLeft:'3%'}}>
+                <form onSubmit={this.addDish} style={{marginLeft:'3%'}}>
                     <div className="row">
                         <div className="col-3">
-                            Dish Images<input type="file" className="form-control-file" placeholder="Dish Image Upload"></input>
+                            Dish Image<input accept="image/*" type="file" className="form-control-file" placeholder="Dish Image Upload" onChange={this.onDishImageChange} required></input>
                         </div>
                     </div>
                     <br />

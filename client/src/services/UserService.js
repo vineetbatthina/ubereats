@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export async function getAllUsers() {
 
     const response = await fetch('http://localhost:3080/api/users');
@@ -33,4 +35,15 @@ export async function getAllRestaurants() {
     const response = await fetch('http://localhost:3080/api/getAllRestaurants');
     data = await response.json();
     return data;
+}
+
+export async function uploadDishtoS3(imageData){
+    let responseUrl = '';
+    try {
+        responseUrl = await axios.post('http://localhost:3080/api/imageUpload/dish', imageData);
+        console.log(responseUrl);
+    } catch (e) {
+        console.log(e);
+    }
+    return responseUrl;
 }

@@ -106,6 +106,18 @@ class Checkout extends Component {
                 totalPrice: totalPrice
             })
         }
+        else{
+            this.setState({
+                street: '',
+                city : '',
+                state: '',
+                country: '',
+                pincode: '',
+                dishes: (this.props.location.state.cartDishes) ? this.props.location.state.cartDishes : [],
+                cartPrice: (this.props.location.state.cartPrice) ? parseInt(this.props.location.state.cartPrice) : 0,
+                totalPrice: totalPrice
+            })
+        }
     }
 
     render() {

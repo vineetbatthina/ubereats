@@ -37,8 +37,8 @@ router.post('/api/saveRestaurantProfile', async (req, res) => {
 
   const restaurantProfile = req.body;
   console.log(restaurantProfile);
-  const update_res = `UPDATE restaurants set store_name = ? ,  store_location = ? , description = ? , cuisine = ?, timings = ? , delivery_type = ?, phone = ?, street = ?, state = ?, country = ?, pincode = ? where owner_email= ?`
-  await connection.query(update_res, [restaurantProfile.restaurantName, restaurantProfile.location, restaurantProfile.description, restaurantProfile.cuisine, restaurantProfile.timings, restaurantProfile.deliveryType, restaurantProfile.phone, restaurantProfile.street, restaurantProfile.state, restaurantProfile.country, restaurantProfile.pincode, restaurantProfile.emailId], async function (error, results) {
+  const update_res = `UPDATE restaurants set store_name = ? ,  store_location = ? , description = ? , restaurant_img = ?, cuisine = ?, timings = ? , delivery_type = ?, phone = ?, street = ?, state = ?, country = ?, pincode = ? where owner_email= ?`
+  await connection.query(update_res, [restaurantProfile.restaurantName, restaurantProfile.location, restaurantProfile.description, restaurantProfile.restaurantImgUrl, restaurantProfile.cuisine, restaurantProfile.timings, restaurantProfile.deliveryType, restaurantProfile.phone, restaurantProfile.street, restaurantProfile.state, restaurantProfile.country, restaurantProfile.pincode, restaurantProfile.emailId], async function (error, results) {
     if (error) {
       console.log(error);
       console.log('Restaurant Profile could not be updated');
@@ -76,6 +76,7 @@ router.post('/api/getRestaurantProfile', async (req, res) => {
 
     else if (results.length === 1) {
       console.log('Successfully Retrieved the Restaurant profile');
+      console.log(JSON.stringify(results[0]));
       res.send(JSON.stringify(results[0]));
     }
 
@@ -144,8 +145,8 @@ router.post('/api/getRestaurantProfileById', async (req, res) => {
 
 router.post('/api/saveDish', async (req, res) => {
 
-  const insert_dish_query = `INSERT INTO dishes (restaurant_id,dish_name,dish_description,dish_price,dish_ingredients,dish_category) select restaurant_id,?,?,?,?,? from restaurants where owner_email = ?`
-  await connection.query(insert_dish_query, [req.body.dishName, req.body.dishDescription, req.body.dishPrice, req.body.dishIngredients, req.body.dishCategory, req.body.emailId], async function (error, results) {
+  const insert_dish_query = `INSERT INTO dishes (restaurant_id,dish_name,dish_description,dish_price,dish_ingredients,dish_category,dish_img) select restaurant_id,?,?,?,?,?,? from restaurants where owner_email = ?`
+  await connection.query(insert_dish_query, [req.body.dishName, req.body.dishDescription, req.body.dishPrice, req.body.dishIngredients, req.body.dishCategory, req.body.dishImgUrl, req.body.emailId], async function (error, results) {
     console.log(JSON.stringify(results));
     if (error) {
       console.log('Dish could not be added');
@@ -246,8 +247,8 @@ router.post('/api/updateDish', async (req, res) => {
 
   const dish = req.body;
   console.log(dish);
-  const update_dish = `UPDATE dishes set dish_name = ?, dish_description = ? ,dish_price = ? , dish_ingredients = ? , dish_category = ? where dish_id = ?`
-  await connection.query(update_dish, [dish.dishName,dish.dishDescription,dish.dishPrice,dish.dishIngredients,dish.dishCategory,dish.dishId], async function (error, results) {
+  const update_dish = `UPDATE dishes set dish_name = ?, dish_description = ? ,dish_price = ? , dish_ingredients = ? , dish_category = ? , dish_img= ? where dish_id = ?`
+  await connection.query(update_dish, [dish.dishName,dish.dishDescription,dish.dishPrice,dish.dishIngredients,dish.dishCategory,dish.dishImgUrl,dish.dishId], async function (error, results) {
     if (error) {
       console.log(error);
       console.log('Diswh with Dish Id '+ dish.dishId + 'could not be updated');

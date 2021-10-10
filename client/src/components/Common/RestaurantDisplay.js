@@ -20,7 +20,7 @@ export default class RestaurantDisplay extends Component {
     showDishComponent(dish){
         let renderedDishCard = null
         if(this.props.location.state.source === "customer"){
-            renderedDishCard =  <DishCustomer restaurantId={this.props.location.state.restaurantId} dishId={dish.dish_id} dishName={dish.dish_name} dishDescription={dish.dish_description} dishPrice={dish.dish_price} dishIngredients={dish.dish_ingredients} dishCategory={dish.dish_category} />
+            renderedDishCard =  <DishCustomer restaurantId={this.props.location.state.restaurantId} dishId={dish.dish_id} dishName={dish.dish_name} dishDescription={dish.dish_description} dishPrice={dish.dish_price} dishIngredients={dish.dish_ingredients} dishCategory={dish.dish_category} dishImg={dish.dish_img}/>
         }
         else {
             renderedDishCard =  <Dish restaurantId={this.props.location.state.restaurantId} dishId={dish.dish_id} dishName={dish.dish_name} dishDescription={dish.dish_description} dishPrice={dish.dish_price} dishIngredients={dish.dish_ingredients} dishCategory={dish.dish_category} />

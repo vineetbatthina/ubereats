@@ -7,6 +7,7 @@ import RestaurantNavBar from './RestaurantNavBar';
 import RestaurantMenuAdd from './RestaurantMenuAdd';
 import { Modal } from 'react-bootstrap';
 import { updateDish } from '../../services/RestaurantService';
+import { uploadDishtoS3 } from '../../services/UserService';
 
 export default class RestaurantMenu extends Component {
 
@@ -23,7 +24,8 @@ export default class RestaurantMenu extends Component {
             currDishPrice: '',
             currDishIngredients: '',
             currDishCategory: '',
-            dishModalVisible: false
+            dishModalVisible: false,
+            dishImg : ''
         }
 
         this.fetchDishes = this.fetchDishes.bind(this);
@@ -53,6 +55,17 @@ export default class RestaurantMenu extends Component {
 
     async updateItem(event) {
         event.preventDefault();
+
+        let dishImgUrl = '';
+
+        if (this.state.dishImg) {
+            const imageData = new FormData();
+            imageData.append('image', this.state.dishImg);
+            const response = await uploadDishtoS3(imageData);
+            dishImgUrl = response.data.imageUrl;
+            console.log(dishImgUrl);
+        }
+
         const dish = {
             dishId: this.state.currDishId,
             newDishImage: (this.state.currDishImg) ? this.state.currDishImg : '',
@@ -60,11 +73,12 @@ export default class RestaurantMenu extends Component {
             dishDescription: this.state.currDishDescription,
             dishPrice: this.state.currDishPrice,
             dishIngredients: this.state.currDishIngredients,
-            dishCategory: this.state.currDishCategory
+            dishCategory: this.state.currDishCategory,
+            dishImgUrl : dishImgUrl
         }
 
         const response = await updateDish(dish);
-        if (response===true) {
+        if (response === true) {
             let emailId = 'default@default.com';
             try {
                 emailId = localStorage.getItem('emailId');
@@ -107,6 +121,13 @@ export default class RestaurantMenu extends Component {
         }
     }
 
+    onDishImageChange = (event) => {
+        const file = event.target.files[0];
+        this.setState({
+            dishImg : file
+        })
+      };
+
     render() {
         let buttonText = "Add Item";
 
@@ -146,7 +167,7 @@ export default class RestaurantMenu extends Component {
                                             dishModalVisible: true
                                         })
                                     }}>
-                                        <Dish dishName={dish.dish_name} dishDescription={dish.dish_description} dishPrice={dish.dish_price} dishIngredients={dish.dish_ingredients} dishCategory={dish.dish_category} />
+                                        <Dish dishName={dish.dish_name} dishDescription={dish.dish_description} dishPrice={dish.dish_price} dishIngredients={dish.dish_ingredients} dishCategory={dish.dish_category} dishImg={dish.dish_img}/>
                                     </div>
                                 )
                             })
@@ -162,7 +183,7 @@ export default class RestaurantMenu extends Component {
                             <form onSubmit={this.updateItem} style={{ marginLeft: '3%' }}>
                                 <div className="row">
                                     <div className="col-3">
-                                        Dish Images<input type="file" className="form-control-file" placeholder="Dish Image Upload" value={this.state.currDishImg} onChange={(e) => this.setState({ currDishImg: e.target.value })} ></input>
+                                        Dish Image<input accept="image/*" type="file" className="form-control-file" placeholder="Dish Image Upload" onChange={this.onDishImageChange} required></input>
                                     </div>
                                 </div>
                                 <br />

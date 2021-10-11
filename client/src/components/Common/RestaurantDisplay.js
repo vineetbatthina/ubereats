@@ -55,15 +55,18 @@ export default class RestaurantDisplay extends Component {
 
             if (this.props.location.state.source === "customer") {
                 let searchFilters = this.props.location.state.dishType;
-                if (searchFilters.isVegChecked || searchFilters.isNonVegChecked) {
-                    if (searchFilters.isVegChecked) {
-                        filters.push("VEGAN");
+                if (searchFilters) {
+                    if (searchFilters.isVegChecked || searchFilters.isNonVegChecked) {
+                        if (searchFilters.isVegChecked) {
+                            filters.push("VEGAN");
+                        }
+                        if (searchFilters.isNonVegChecked) {
+                            filters.push("NONVEG");
+                        }
+                        dishesFromBackend = dishesFromBackend.filter((dish) => String(filters).includes(dish.dish_category));
                     }
-                    if (searchFilters.isNonVegChecked) {
-                        filters.push("NONVEG");
-                    }
-                    dishesFromBackend = dishesFromBackend.filter((dish) => String(filters).includes(dish.dish_category));
                 }
+
             }
 
             this.setState({

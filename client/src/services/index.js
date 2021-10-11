@@ -1,3 +1,4 @@
+import serverUrl from "../utils/clientconfig";
 const TOKEN_KEY = 'jwt';
 
 export const login = async (credentials) => {
@@ -14,7 +15,7 @@ export const login = async (credentials) => {
     }
     console.log("User Trying to Login");
     try {
-        const fetchResponse = await fetch('http://localhost:3080/api/login', requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/api/login`, requestOptions);
         const data = await fetchResponse;
         if(data.status === 200 ){
             response.restaurantOwner = data.statusText;

@@ -1,25 +1,23 @@
-# ubereats
+# Steps to start the ubereatsclone application.
 
-Steps to start. the application.
+1) Securely SSH into the AWS EC2 instance. 
 
-Securely SSH into the AWS EC2 instance. 
+2) Navigate to the ubereats directory
 
-Navigate to the ubereats directory
+3) Navigate into server folder
 
-Navigate into server folder
+4) Start the backend server first using command:
 
-Start the backend server first using command:
+5) node index
 
-node index
+6) Navigate to the client folder inside ubereats directory 
 
-Navigate to the client folder inside ubereats directory 
+7) Start the client side react application using command :
 
-Start the client side react application using command :
+8) npm start
 
-npm start
+9) Search for the publicly exposed IP on the EC2 instance.
 
-Search for the publicly exposed IP on the EC2 instance.
+10) React front end would be running on the port : 3000
 
-React front end would be running on the port : 3000
-
-Node Back end would be running on the port : 3080
+11) Node Back end would be running on the port : 3080

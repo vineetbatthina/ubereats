@@ -17,7 +17,7 @@ export async function createRestaurant(restuarant) {
     };
     console.log("Client Side restaurant object Sent:" + restuarant);
     try {
-        const fetchResponse = await fetch(`${serverUrl}/api/createRestaurant`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/mongo/createRestaurant`, requestOptions);
         const data = await fetchResponse;
         if (data.status === 200 || data.status === 301) {
             return data.status;
@@ -40,7 +40,7 @@ export async function getRestaurantProfile(request) {
         body: JSON.stringify(request)
     };
     try {
-        const fetchResponse = await fetch(`${serverUrl}/api/getRestaurantProfile`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/mongo/getRestaurantProfile`, requestOptions);
         const data = await fetchResponse.text();
         if (fetchResponse.status === 200) {
             resProfile = JSON.parse(data);
@@ -60,7 +60,7 @@ export async function saveRestaurantProfile(restaurantProfile) {
         body: JSON.stringify(restaurantProfile)
     };
     try {
-        const fetchResponse = await fetch(`${serverUrl}/api/saveRestaurantProfile`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/mongo/saveRestaurantProfile`, requestOptions);
         return fetchResponse.status;
     } catch (e) {
         console.log(e);

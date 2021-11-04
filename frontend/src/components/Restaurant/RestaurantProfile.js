@@ -131,7 +131,7 @@ export default class RestaurantProfile extends Component {
                 let dishTypes = restaurantProfile.dishes_type.split(",");
                 
                 dishTypes.map((type) => {
-                    if (type === "VEG") {
+                    if (type === "VEGAN") {
                         isVegChecked = true;
                     }
                     else if(type === "NONVEG"){

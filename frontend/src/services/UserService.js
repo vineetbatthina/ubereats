@@ -1,13 +1,6 @@
 import axios from 'axios';
 import serverUrl from '../utils/clientconfig';
 
-export async function getAllUsers() {
-
-    const response = await fetch(`${serverUrl}/api/users`);
-    const data = await response.json();
-    return data;
-}
-
 export async function createUser(user) {
 
     const requestOptions = {
@@ -17,7 +10,7 @@ export async function createUser(user) {
     };
     console.log("Client Side User Sent:"+ user);
     try {
-        const fetchResponse = await fetch(`${serverUrl}/api/createUser`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/mongo/createUser`, requestOptions);
         const data = await fetchResponse;
         if(data.status === 200 || data.status === 301){
             return data.status;
@@ -33,7 +26,7 @@ export async function createUser(user) {
 
 export async function getAllRestaurants() {
     let data =null;
-    const response = await fetch(`${serverUrl}/api/getAllRestaurants`);
+    const response = await fetch(`${serverUrl}/mongo/getAllRestaurants`);
     data = await response.json();
     return data;
 }

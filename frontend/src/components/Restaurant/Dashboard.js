@@ -6,7 +6,7 @@ import res_img_2 from '../../images/restaurant_profile_2.jpg';
 import res_img_3 from '../../images/restaurant_profile_3.jpg';
 import '../../css/Restaurant.css';
 import { getRestaurantProfile } from '../../services/RestaurantService';
-
+import defaultRestaurant from '../../images/restaurant_1.jpg';
 
 export default class Dashboard extends Component {
 
@@ -66,8 +66,8 @@ export default class Dashboard extends Component {
                 <RestaurantNavBar />
                 <div>
                     <div className="text-center">
-                        <img src={this.state.restaurantImgUrl} className="img-fluid" onError={(e) => { e.target.onerror = null; e.target.src = "../../images/default_dish.jpg" }} />
-                        <div class="caption">
+                        <img src={this.state.restaurantImgUrl} className="img-fluid" onError={(e) => { console.log("Image error");e.target.onerror = null; e.target.src = defaultRestaurant }} />
+                        <div className="caption">
                             <h1>{this.state.restaurantName}</h1>
                             <p>{this.state.description}</p>
                         </div>

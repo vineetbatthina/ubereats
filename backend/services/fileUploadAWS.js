@@ -10,7 +10,6 @@ aws.config.update({
   region: 'us-east-2',
 });
 
-
 var upload = multer({
     storage: multerS3({
       s3: new aws.S3(),

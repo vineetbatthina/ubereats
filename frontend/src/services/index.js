@@ -15,7 +15,7 @@ export const login = async (credentials) => {
     }
     console.log("User Trying to Login");
     try {
-        const fetchResponse = await fetch(`${serverUrl}/api/login`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/mongo/login`, requestOptions);
         const data = await fetchResponse;
         if(data.status === 200 ){
             response.restaurantOwner = data.statusText;

@@ -1,90 +1,66 @@
 const express = require('express');
 const router = express.Router();
-
-const connection = require('../resources.js');
 const { upload } = require('../services/fileUploadAWS');
 const Users = require('../Models/UserModel');
-const Restaurants = require('../Models/Restaurants');
+var kafka = require('../kafka/client');
 
-router.post('/mongo/createUser', (req, res) => {
-  const user = req.body;
-  const newUser = new Users({
-    user_name : user.userName,
-    user_emailId : user.userEmail,
-    user_pwd : user.password,
-    restaurant_owner : user.restaurantOwner
-  });
-
-  Users.findOne({ user_emailId: user.userEmail }, (error, resultUser) => {
-      if (error) {
-          res.writeHead(500, {
-              'Content-Type': 'text/plain'
-          })
-          res.end();
-      }
-      if (resultUser) {
-          res.writeHead(400, {
-              'Content-Type': 'text/plain'
-          })
-          res.end("Book ID already exists");
-      }
-      else {
-        newUser.save((error, data) => {
-              if (error) {
-                  res.writeHead(500, {
-                      'Content-Type': 'text/plain'
-                  })
-                  res.end();
-              }
-              else {
-                  res.writeHead(200, {
-                      'Content-Type': 'text/plain'
-                  })
-                  res.end();
-              }
-          });
-      }
-  });
-});
+const { USER_TOPIC } = require('../kafka/topics');
+const { responseHandler, internalError } = require('./responses');
 
 router.post('/api/imageUpload/:entity', upload.single('image'), function (req, res, next) {
   res.send({ imageUrl: req.file.location });
 });
 
-router.get('/testMongo', (req, res) => {
-  const newUser = new Users({
-    user_id : '1',
-    user_name : 'Vineet Batthina 2',
-    user_emailId : 'abc@xyz.com',
-    user_pwd : 'pwdEncrytpt',
-    restaurant_owner : 'someone'
-  });
+router.post('/kafka/createUser', function (req, res) {
 
-  newUser.save((error,data) => {
-    if(error){
-      console.log(error);
+  console.log("Request body is:" + req.body);
+  const request = {
+    req: req.body,
+    type: "createUser"
+  }
+
+  console.log("API CALLEDDDDD");
+  kafka.make_request(USER_TOPIC, request, function (err, result) {
+    console.log('in result');
+    console.log(result);
+    if (err) {
+      internalError(result);
+    } else {
+      responseHandler(res, result);
     }
-    else{
-      console.log("Successfully inserted user");
-    }
-  })
+  });
 });
 
-router.get('/testId', (req, res) => {
-  Restaurants.findOne({ _id: "6178724de35c675882d55cac"}, (error, resultRestaurant) => {
+router.post('/kafka/login', function (req, res) {
 
-    if (resultRestaurant) {
-      console.log('Successfully Retrieved the Restaurant profile');
-      res.send(JSON.stringify(resultRestaurant));
-    }
-    else {
+  console.log("Request body is:" + req.body);
+  const request = {
+    req: req.body,
+    type: "login"
+  }
+
+  console.log("Login API called....");
+  kafka.make_request(USER_TOPIC, request, function (error, user) {
+    if (error) {
       res.writeHead(500, {
         'Content-Type': 'text/plain'
       })
-      res.end();
+      res.end("Error Occured");
+    }
+    if (user) {
+      res.cookie('cookie', user.user_name, { maxAge: 900000, httpOnly: false, path: '/' });
+      res.writeHead(200, user.restaurant_owner, {
+        'Content-Type': 'text/plain'
+      });
+      res.end("SUCCESSFULL LOGIN");
+    }
+    else {
+      res.writeHead(401, {
+        'Content-Type': 'text/plain'
+      })
+      res.end("Invalid Credentials");
     }
   });
 });
-
 
 module.exports = router;

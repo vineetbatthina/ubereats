@@ -17,7 +17,7 @@ export async function createRestaurant(restuarant) {
     };
     console.log("Client Side restaurant object Sent:" + restuarant);
     try {
-        const fetchResponse = await fetch(`${serverUrl}/mongo/createRestaurant`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/kafka/createRestaurant`, requestOptions);
         const data = await fetchResponse;
         if (data.status === 200 || data.status === 301) {
             return data.status;

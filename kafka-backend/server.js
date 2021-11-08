@@ -1,10 +1,17 @@
 var connection =  new require('./kafka/Connection');
-//topics files
-//var signin = require('./services/signin.js');
-var Books = require('./services/books.js');
+
+require('./resources.js');
+
+let users = require('./services/users');
+let restaurants = require('./services/restaurants');
+let customers = require('./services/customers');
+
+const {
+    USER_TOPIC, RESTAURANT_TOPIC, CUSTOMER_TOPIC
+} = require('./kafka/topics');
 
 function handleTopicRequest(topic_name,fname){
-    //var topic_name = 'root_topic';
+
     var consumer = connection.getConsumer(topic_name);
     var producer = connection.getProducer();
     console.log('server is running ');
@@ -32,7 +39,7 @@ function handleTopicRequest(topic_name,fname){
         
     });
 }
-// Add your TOPICs here
-//first argument is topic name
-//second argument is a function that will handle this topic request
-handleTopicRequest("post_book",Books)
+
+handleTopicRequest(USER_TOPIC, users);
+handleTopicRequest(RESTAURANT_TOPIC, restaurants);
+handleTopicRequest(CUSTOMER_TOPIC, customers);

@@ -7,56 +7,72 @@ const Dishes = require('../Models/Dishes');
 const Orders = require('../Models/Orders');
 const CustomerProfiles = require('../Models/CustomerProfiles');
 
-router.get('/mongo/getAllRestaurants', (req, res) => {
-  Restaurants.find({}, (error, results) => {
-      if (error) {
-          res.writeHead(500, {
-              'Content-Type': 'text/plain'
-          })
-          res.end();
-      }
-      else {
-          res.writeHead(200, {
-              'Content-Type': 'application/json'
-          });
-          res.end(JSON.stringify(results));
-      }
-  });
-});
+const { CUSTOMER_TOPIC } = require('../kafka/topics');
+var kafka = require('../kafka/client');
 
-router.post('/mongo/getDishesbyResId', (req, res) => {
-  console.log('Fetching for dishes of a restaurant....');
-  Dishes.find({restaurant_id : req.body.restaurantId}, (error, results) => {
-      if (error) {
-          res.writeHead(500, {
-              'Content-Type': 'text/plain'
-          })
-          res.end();
-      }
-      else {
-          res.writeHead(200, {
-              'Content-Type': 'application/json'
-          });
-          res.end(JSON.stringify(results));
-      }
-  });
-});
+router.get('/kafka/getAllRestaurants', async (req, res) => {
+  
+  console.log("Request body is:" + req.body);
 
-router.post('/api/sendOrders', async (req, res) => {
-  const custEmailId = req.body.custEmailId;
-  const restaurantId = req.body.restaurantId;
-  const dishes = req.body.dishes;
-  const deliveryAddress = req.body.deliveryAddress;
-  const orderTimeStamp = req.body.orderTimeStamp;
-  const paymentMode = req.body.paymentMode;
-  const totalPrice = req.body.totalPrice;
+  const request = {
+    type: "getAllRestaurants"
+  }
 
-  console.log('Saving Order....');
-  const insert_order_query = `INSERT INTO orders ( cust_email_id, restaurant_id, dishes_ordered, delivery_address, order_timestamp, payment_mode, order_price, status) values (?,?,?,?,?,?,?,'RECEIVED')`
-  await connection.query(insert_order_query, [custEmailId, restaurantId, dishes, deliveryAddress, orderTimeStamp, paymentMode, totalPrice], async function (error, results) {
-    if (error) {
+  console.log("getAllRestaurants API Called.....");
+  kafka.make_request(CUSTOMER_TOPIC, request, function (err, results) {
+    console.log('in result');
+    console.log(results);
+    if (err) {
       console.log("Not Successfull");
-      res.send(JSON.stringify(error));
+      res.send(JSON.stringify(err));
+    }
+    else {
+      console.log("Successfully Retrieved all the restaurants");
+      res.send(JSON.stringify(results));
+    }
+  });
+});
+
+router.post('/kafka/getDishesbyResId', async (req, res) => {
+  
+  console.log("Request body is:" + req.body);
+
+  const request = {
+    req: req.body,
+    type: "getDishesbyResId"
+  }
+
+  console.log("getDishesbyResId API Called.....");
+  kafka.make_request(CUSTOMER_TOPIC, request, function (err, results) {
+    console.log('in result');
+    console.log(results);
+    if (err) {
+      console.log("Not Successfull");
+      res.send(JSON.stringify(err));
+    }
+    else {
+      console.log('Successfully Fetched Dishes of restaurant');
+      res.send(JSON.stringify(results));
+    }
+  });
+});
+
+router.post('/kafka/sendOrders', async (req, res) => {
+  
+  console.log("Request body is:" + req.body);
+
+  const request = {
+    req: req.body,
+    type: "sendOrders"
+  }
+
+  console.log("sendOrders API Called.....");
+  kafka.make_request(CUSTOMER_TOPIC, request, function (err, results) {
+    console.log('in result');
+    console.log(results);
+    if (err) {
+      console.log("Not Successfull");
+      res.send(JSON.stringify(err));
     }
     else {
       console.log('Successfully Received an Order');
@@ -65,49 +81,68 @@ router.post('/api/sendOrders', async (req, res) => {
   });
 });
 
-router.post('/mongo/getOrdersByCustEmail', (req, res) => {
-  console.log('Fetching for dishes of a restaurant....');
-  Orders.find({cust_email_id : req.body.emailId}, (error, results) => {
-      if (error) {
-          res.writeHead(500, {
-              'Content-Type': 'text/plain'
-          })
-          res.end();
-      }
-      else {
-          res.writeHead(200, {
-              'Content-Type': 'application/json'
-          });
-          res.end(JSON.stringify(results));
-      }
-  });
-});
+router.post('/kafka/getOrdersByCustEmail', async (req, res) => {
+  
+  console.log("Request body is:" + req.body);
 
-router.post('/mongo/getCustomerProfileByEmailId', (req, res) => {
-  console.log('Fetching for dishes of a restaurant....');
-  CustomerProfiles.find({email_id : req.body.emailId}, (error, results) => {
-      if (error) {
-          res.writeHead(500, {
-              'Content-Type': 'text/plain'
-          })
-          res.end();
-      }
-      else {
-          console.log('Successfully Retrieved the Profile for Customer');
-          res.writeHead(200, {
-              'Content-Type': 'application/json'
-          });
-          res.end(JSON.stringify(results));
-      }
-  });
-});
+  const request = {
+    req: req.body,
+    type: "getOrdersByCustEmail"
+  }
 
-router.post('/api/saveCustomerProfile', async (req, res) => {
-  const insert_default_user_profile_sql = `insert into customer_profiles (email_id, phone, name , nick_name, DOB , address, profile_img) values (?,?,?,?,?,?,?)`
-  await connection.query(insert_default_user_profile_sql, [req.body.emailId,req.body.phone,req.body.name,req.body.nickName,req.body.dob,req.body.address,req.body.profileImg], async function (error, results) {
-    if (error) {
+  console.log("getOrdersByCustEmail API Called.....");
+  kafka.make_request(CUSTOMER_TOPIC, request, function (err, results) {
+    console.log('in result');
+    console.log(results);
+    if (err) {
       console.log("Not Successfull");
-      res.send(JSON.stringify(error));
+      res.send(JSON.stringify(err));
+    }
+    else {
+      console.log('Successfully Fetched Orders of Customer');
+      res.send(JSON.stringify(results));
+    }
+  });
+});
+
+router.post('/kafka/getCustomerProfileByEmailId', async (req, res) => {
+  
+  console.log("Request body is:" + req.body);
+
+  const request = {
+    req: req.body,
+    type: "getCustomerProfileByEmailId"
+  }
+
+  console.log("getCustomerProfileByEmailId API Called.....");
+  kafka.make_request(CUSTOMER_TOPIC, request, function (err, results) {
+    console.log('in result');
+    console.log(results);
+    if (err) {
+      console.log("Not Successfull");
+      res.send(JSON.stringify(err));
+    }
+    else {
+      console.log('Successfully Fetched Profile of Customer');
+      res.send(JSON.stringify(results));
+    }
+  });
+});
+
+router.post('/kafka/saveCustomerProfile', async (req, res) => {
+  
+  console.log("Request body is:" + req.body);
+
+  const request = {
+    req: req.body,
+    type: "saveCustomerProfile"
+  }
+
+  console.log("saveCustomerProfile API Called.....");
+  kafka.make_request(CUSTOMER_TOPIC, request, function (err, results) {
+    if (console.error()) {
+      console.log("Not Successfull");
+      res.send(JSON.stringify(err));
     }
     else {
       console.log('Successfully Saved the customer Profile');
@@ -116,9 +151,17 @@ router.post('/api/saveCustomerProfile', async (req, res) => {
   });
 });
 
-router.post('/api/updateCustomerProfile', async (req, res) => {
-  const insert_default_user_profile_sql = `update customer_profiles set email_id = ?, phone = ?,  name = ? ,  nick_name = ?,  DOB = ? ,  address = ?,  profile_img = ? where email_id = ?`
-  await connection.query(insert_default_user_profile_sql, [req.body.emailId,req.body.phone,req.body.name,req.body.nickName,req.body.dob,req.body.address,req.body.profilePictureUrl,req.body.emailId], async function (error, results) {
+router.post('/kafka/updateCustomerProfile', async (req, res) => {
+  
+  console.log("Request body is:" + req.body);
+
+  const request = {
+    req: req.body,
+    type: "updateCustomerProfile"
+  }
+
+  console.log("updateCustomerProfile API Called.....");
+  kafka.make_request(CUSTOMER_TOPIC, request, function (error, respose) {
     if (error) {
       console.log("Not Successfull");
       res.send(JSON.stringify(error));
@@ -130,6 +173,7 @@ router.post('/api/updateCustomerProfile', async (req, res) => {
   });
 });
 
+//TBC
 router.post('/api/getRestaurantsBasedonSearch', async (req, res) => {
   const searchString = req.body.searchString.concat('%');
   const select_restaurants_based_on_search = `SELECT DISTINCT r.restaurant_id,r.store_name,r.store_location,r.owner_email,r.description,r.timings,r.phone,r.street,r.state,r.country,r.pincode,r.restaurant_img,r.delivery_type,r.dishes_type FROM restaurants r LEFT OUTER JOIN dishes m ON m.restaurant_id = r.restaurant_id WHERE (m.dish_name LIKE ? OR m.dish_description LIKE ? OR r.store_name LIKE ? OR r.store_location LIKE ? OR r.cuisine LIKE ?);`
@@ -145,48 +189,56 @@ router.post('/api/getRestaurantsBasedonSearch', async (req, res) => {
   });
 });
 
-router.post('/mongo/getFavourites', (req, res) => {
-  console.log('Fetching for Favourites of a customer....');
-  CustomerProfiles.find({email_id : req.body.emailId}, (error, results) => {
-      if (error) {
-          res.writeHead(500, {
-              'Content-Type': 'text/plain'
-          })
-          res.end();
-      }
-      else {
-          console.log('Successfully Retrieved the Profile for Customer');
-          res.writeHead(200, {
-              'Content-Type': 'application/json'
-          });
-          res.end(JSON.stringify(results.favourites));
-      }
+router.post('/kafka/getFavourites', async (req, res) => {
+  
+  console.log("Request body is:" + req.body);
+
+  const request = {
+    req: req.body,
+    type: "getCustomerProfileByEmailId"
+  }
+
+  console.log("getCustomerProfileByEmailId API Called.....");
+  kafka.make_request(CUSTOMER_TOPIC, request, function (error, results) {
+    if (error) {
+      res.writeHead(500, {
+          'Content-Type': 'text/plain'
+      })
+      res.end();
+  }
+  else {
+      console.log('Successfully Retrieved the Favourites for Customer');
+      res.writeHead(200, {
+          'Content-Type': 'application/json'
+      });
+      res.end(JSON.stringify(results[0].favourites));
+  }
   });
 });
 
-router.post('/mongo/updateFavourites', (req, res) => {
-  console.log('Updating Favourites of a customer....');
-  CustomerProfiles.updateOne({email_id : req.body.emailId}, {
-    $set: {
-      favourites : req.body.updatedFavourites
+router.post('/kafka/updateFavourites', async (req, res) => {
+  
+  console.log("Request body is:" + req.body);
+
+  const request = {
+    req: req.body,
+    type: "updateFavourites"
+  }
+
+  console.log("updateFavourites API Called.....");
+  kafka.make_request(CUSTOMER_TOPIC, request, function (error, results) {
+    if (error) {
+      console.log("Not Successfull");
+      res.send(false);
     }
-  }, (error, results) => {
-      if (error) {
-          res.writeHead(500, {
-              'Content-Type': 'text/plain'
-          })
-          res.send(false);
-      }
-      else {
-          console.log('Successfully updated the favourites of the restaurant');
-          res.writeHead(200, {
-              'Content-Type': 'application/json'
-          });
-          res.send(true);
-      }
+    else {
+      console.log('Successfully Updated the customer favourites');
+      res.send(true);
+    }
   });
 });
 
+//TBC
 router.post('/api/getRestaurantsBasedonIds', async (req, res)=>{
 
   const select_restaurants = `SELECT * FROM restaurants where restaurant_id IN ?`;
@@ -202,23 +254,27 @@ router.post('/api/getRestaurantsBasedonIds', async (req, res)=>{
   });
 });
 
+router.post('/kafka/getCustomerProfileByEmailId', async (req, res) => {
+  
+  console.log("Request body is:" + req.body);
 
-router.post('/mongo/getRestaurantProfileByID', (req, res) => {
-  console.log('Fetching for Restaurant Profile');
-  Restaurants.find({restaurant_id : req.body.resId}, (error, results) => {
-      if (error) {
-          res.writeHead(500, {
-              'Content-Type': 'text/plain'
-          })
-          res.end();
-      }
-      else {
-          console.log('Successfully Retrieved the Profile for Restaurant');
-          res.writeHead(200, {
-              'Content-Type': 'application/json'
-          });
-          res.end(JSON.stringify(results));
-      }
+  const request = {
+    req: req.body,
+    type: "getCustomerProfileByEmailId"
+  }
+
+  console.log("getCustomerProfileByEmailId API Called.....");
+  kafka.make_request(CUSTOMER_TOPIC, request, function (err, results) {
+    console.log('in result');
+    console.log(results);
+    if (err) {
+      console.log("Not Successfull");
+      res.send(JSON.stringify(err));
+    }
+    else {
+      console.log('Successfully Fetched Profile of Customer');
+      res.send(JSON.stringify(results));
+    }
   });
 });
 

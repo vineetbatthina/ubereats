@@ -8,30 +8,30 @@ export async function createUser(user) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user)
     };
-    console.log("Client Side User Sent:"+ user);
+    console.log("Client Side User Sent:" + user);
     try {
-        const fetchResponse = await fetch(`${serverUrl}/mongo/createUser`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/kafka/createUser`, requestOptions);
         const data = await fetchResponse;
-        if(data.status === 200 || data.status === 301){
+        if (data.status === 200 || data.status === 301) {
             return data.status;
         }
-        else{
+        else {
             return 0;
         }
     } catch (e) {
         console.log(e);
         return -1;
-    }  
+    }
 }
 
 export async function getAllRestaurants() {
-    let data =null;
+    let data = null;
     const response = await fetch(`${serverUrl}/mongo/getAllRestaurants`);
     data = await response.json();
     return data;
 }
 
-export async function uploadDishtoS3(imageData){
+export async function uploadDishtoS3(imageData) {
     let responseUrl = '';
     try {
         responseUrl = await axios.post(`${serverUrl}/api/imageUpload/dish`, imageData);

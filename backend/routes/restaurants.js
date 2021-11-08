@@ -6,193 +6,119 @@ const Restaurants = require('../Models/Restaurants');
 const Dishes = require('../Models/Dishes');
 const Orders = require('../Models/Orders');
 
-router.post('/mongo/createRestaurant', (req, res) => {
-  console.log('Adding a Restaurant', restaurant);
-  const restaurant = req.body;
-  const newRestaurant = new Restaurants({
-    store_name: restaurant.storeName,
-    store_location: restaurant.storeLocation,
-    owner_email: restaurant.ownerEmail,
-    description: '',
-    restaurant_img: '',
-    timings: '',
-    phone: '',
-    street: '',
-    state: '',
-    country: '',
-    pincode: ''
-  });
+const { RESTAURANT_TOPIC } = require('../kafka/topics');
+var kafka = require('../kafka/client');
+const { responseHandler, internalError } = require('./responses');
 
-  Restaurants.findOne({ owner_email: restaurant.ownerEmail }, (error, resultRestaurant) => {
-    if (error) {
+router.post('/kafka/saveRestaurantProfile', function (req, res) {
+
+  console.log('updating the profile of restaurant');
+  const request = {
+    req: req.body,
+    type: "saveRestaurantProfile"
+  }
+
+  console.log("saveRestaurantProfile API Called.....");
+  kafka.make_request(RESTAURANT_TOPIC, request, function (err, result) {
+    console.log('in result');
+    console.log(result);
+    if (err) {
+      console.log(err);
       res.writeHead(500, {
         'Content-Type': 'text/plain'
       })
-      res.end();
-    }
-    if (resultRestaurant) {
-      res.writeHead(400, {
-        'Content-Type': 'text/plain'
-      })
-      res.end("Restaurant already exists");
-    }
-    else {
-      newRestaurant.save((error, data) => {
-        if (error) {
-          res.writeHead(500, {
-            'Content-Type': 'text/plain'
-          })
-          res.end();
-        }
-        else {
-          res.writeHead(200, {
-            'Content-Type': 'text/plain'
-          })
-          res.end();
-        }
-      });
-    }
-  });
-});
-
-router.post('/mongo/saveRestaurantProfile', async (req, res) => {
-
-  const restaurantProfile = req.body;
-  Restaurants.updateOne({ owner_email: restaurantProfile.emailId }, {
-    $set: {
-      store_name: restaurantProfile.restaurantName,
-      store_location: restaurantProfile.location,
-      description: restaurantProfile.description,
-      restaurant_img: restaurantProfile.restaurantImgUrl,
-      cuisine: restaurantProfile.cuisine,
-      timings: restaurantProfile.timings,
-      delivery_type: restaurantProfile.deliveryType,
-      dishes_type: restaurantProfile.dishesType,
-      phone: restaurantProfile.phone,
-      street: restaurantProfile.street,
-      state: restaurantProfile.state,
-      country: restaurantProfile.country,
-      pincode: restaurantProfile.pincode,
-      owner_email: restaurantProfile.emailId
-    }
-  }, (err, res) => {
-    if (err) throw err;
-    console.log("1 document updated");
-    console.log(res);
-  });
-});
-
-router.post('/mongo/getRestaurantProfile', (req, res) => {
-  Restaurants.findOne({ owner_email: req.body.emailId }, (error, resultRestaurant) => {
-    if (error) {
-      console.log(error);
-      res.writeHead(500, {
-        'Content-Type': 'text/plain'
-      })
-      res.end();
-    }
-    else if (resultRestaurant) {
-      console.log('Successfully Retrieved the Restaurant profile');
-      res.send(JSON.stringify(resultRestaurant));
-    }
-    else {
-      res.writeHead(500, {
-        'Content-Type': 'text/plain'
-      })
-      res.end();
-    }
-  });
-});
-
-router.post('/mongo/getRestaurantProfileById', (req, res) => {
-  Restaurants.findOne({ _id: req.body.restaurantId }, (error, resultRestaurant) => {
-
-    if (error) {
-      console.log(error);
-      res.writeHead(500, {
-        'Content-Type': 'text/plain'
-      })
-      res.end();
-    }
-    else if (resultRestaurant) {
-      console.log('Successfully Retrieved the Restaurant profile');
-      res.send(JSON.stringify(resultRestaurant));
-    }
-    else {
-      res.writeHead(500, {
-        'Content-Type': 'text/plain'
-      })
-      res.end();
-    }
-  });
-});
-
-router.post('/mongo/saveDish', async (req, res) => {
-
-  console.log('Saving a Dish', restaurant);
-
-  let restaurantId = '';
-  Restaurants.findOne({ owner_email: req.body.emailId }, (error, resultRestaurant) => {
-    if (error) {
-      console.log("Error while fetching Restaurant : " + error);
-    }
-    else if (resultRestaurant) {
-      console.log('Successfully Retrieved the Restaurant profile');
-      restaurantId = resultRestaurant.id;
-    }
-    else {
-      console.log("Not sure what happened");
-    }
-  });
-
-  const newDish = new Dishes({
-    restaurant_id: restaurantId,
-    dish_name: req.body.dishName,
-    dish_description: req.body.dishDescription,
-    dish_price: req.body.dishPrice,
-    dish_ingredients: req.body.dishIngredients,
-    dish_category: req.body.dishCategory,
-    dish_img: req.body.dishImgUrl,
-  });
-  newDish.save((error, data) => {
-    if (error) {
-      res.writeHead(500, {
-        'Content-Type': 'text/plain'
-      })
-      res.end();
+      res.end(String.toString(err));
     }
     else {
       res.writeHead(200, {
         'Content-Type': 'text/plain'
       })
-      res.end();
+      res.end("Success");
     }
   });
-
 });
 
-router.post('/mongo/getDishes', async (req, res) => {
+router.post('/kafka/getRestaurantProfile', function (req, res) {
 
-  let restaurantId = '';
-  Restaurants.findOne({ owner_email: req.body.emailId }, (error, resultRestaurant) => {
-    if (error) {
-      console.log("Error while fetching Restaurant : " + error);
-    }
-    else if (resultRestaurant) {
-      console.log('Successfully Retrieved the Restaurant profile');
-      restaurantId = resultRestaurant.id;
-    }
-    else {
-      console.log("Not sure what happened");
-    }
-  });
+  console.log('fetching the profile of restaurant');
+  const request = {
+    req: req.body,
+    type: "getRestaurantProfile"
+  }
 
-  Dishes.find({ restaurant_id: restaurantId }, (error, results) => {
-    if (error) {
+  console.log("getRestaurantProfile API Called.....");
+  kafka.make_request(RESTAURANT_TOPIC, request, function (err, result) {
+    console.log('in result');
+    console.log(result);
+    if (err) {
+      console.log(err);
       res.writeHead(500, {
         'Content-Type': 'text/plain'
       })
-      res.end();
+      res.end(String.toString(err));
+    }
+    else if (result) {
+      console.log('Successfully Retrieved the Restaurant profile');
+      res.send(JSON.stringify(result));
+    }
+    else {
+      res.writeHead(500, {
+        'Content-Type': 'text/plain'
+      })
+      res.end("Internal Error");
+    }
+  });
+});
+
+router.post('/kafka/getRestaurantProfileById', function (req, res) {
+
+  console.log('fetching the profile of restaurant');
+  const request = {
+    req: req.body,
+    type: "getRestaurantProfileById"
+  }
+
+  console.log("getRestaurantProfileById API Called.....");
+  kafka.make_request(RESTAURANT_TOPIC, request, function (err, result) {
+    console.log('in result');
+    console.log(result);
+    if (err) {
+      console.log(err);
+      res.writeHead(500, {
+        'Content-Type': 'text/plain'
+      })
+      res.end(String.toString(err));
+    }
+    else if (result) {
+      console.log('Successfully Retrieved the Restaurant profile');
+      res.send(JSON.stringify(result));
+    }
+    else {
+      res.writeHead(500, {
+        'Content-Type': 'text/plain'
+      })
+      res.end("Internal Error");
+    }
+  });
+});
+
+router.post('/kafka/getDishes', function (req, res) {
+
+  console.log('fetching the dishes of restaurant');
+  const request = {
+    req: req.body,
+    type: "getDishes"
+  }
+
+  console.log("getDishes API Called.....");
+  kafka.make_request(RESTAURANT_TOPIC, request, function (err, results) {
+    console.log('in result');
+    console.log(results);
+    if (err) {
+      res.writeHead(500, {
+        'Content-Type': 'text/plain'
+      })
+      res.end("Error fetching Dishes");
     }
     else {
       res.writeHead(200, {
@@ -203,30 +129,24 @@ router.post('/mongo/getDishes', async (req, res) => {
   });
 });
 
-router.post('/mongo/getOrdersByResId', async (req, res) => {
+router.post('/kafka/getOrdersByResId', function (req, res) {
 
-  let restaurantId = '';
-  Restaurants.findOne({ owner_email: req.body.emailId }, (error, resultRestaurant) => {
-    if (error) {
-      console.log("Error while fetching Restaurant : " + error);
-    }
-    else if (resultRestaurant) {
-      console.log('Successfully Retrieved the Restaurant profile');
-      restaurantId = resultRestaurant.id;
-    }
-    else {
-      console.log("Not sure what happened");
-    }
-  });
+  console.log('Updating the order');
+  const request = {
+    req: req.body,
+    type: "getOrdersByResId"
+  }
 
-  Orders.find({ restaurant_id: restaurantId }, (error, results) => {
-    if (error) {
+  console.log("getOrdersByResId API Called.....");
+  kafka.make_request(RESTAURANT_TOPIC, request, function (err, results) {
+    console.log('in result');
+    console.log(results);
+    if (err) {
       res.writeHead(500, {
         'Content-Type': 'text/plain'
       })
       res.end();
-    }
-    else {
+    } else {
       res.writeHead(200, {
         'Content-Type': 'application/json'
       });
@@ -235,43 +155,88 @@ router.post('/mongo/getOrdersByResId', async (req, res) => {
   });
 });
 
-router.post('/mongo/updateOrder', async (req, res) => {
+router.post('/kafka/updateOrder', function (req, res) {
 
   console.log('Updating the order');
+  const request = {
+    req: req.body,
+    type: "updateOrder"
+  }
 
-  Orders.updateOne({ id: req.body.orderId }, {
-    $set: {
-      status: req.body.orderId
+  console.log("updateOrder API Called.....");
+  kafka.make_request(RESTAURANT_TOPIC, request, function (err, result) {
+    console.log('in result');
+    console.log(result);
+    if (err) {
+      console.log("Update of Order failed : " + err);
+      res.send("Update Failed");
+    } else {
+      console.log("1 Order updated");
+      res.send("Successful");
     }
-  }, (err, res) => {
-    if (err) throw err;
-    console.log("1 Order updated");
-    console.log(res);
   });
 });
 
-router.post('/mongo/updateDish', async (req, res) => {
+router.post('/kafka/saveDish', function (req, res) {
 
-  console.log('Updating the order');
-  const dish = req.body;
+  console.log("Request body is:" + req.body);
+  const request = {
+    req: req.body,
+    type: "saveDish"
+  }
 
-  Dishes.updateOne({ id: dish.dishId }, {
-    $set: {
-      dish_name: dish.dishName,
-      dish_description : dish.dishDescription,
-      dish_price: dish.dishPrice,
-      dish_ingredients : dish.dishIngredients,
-      dish_category : dish.dishCategory,
-      dish_img :  dish.dishImgUrl
+  console.log("saveDish API Called.....");
+  kafka.make_request(RESTAURANT_TOPIC, request, function (err, result) {
+    console.log('in result');
+    console.log(result);
+    if (err) {
+      console.log("Saving a Dish failed : " + err);
+      res.send("Save Failed");
+    } else {
+      console.log("1 Dish Created");
+      res.send("Successful");
     }
-  }, (err, res) => {
+  });
+});
+
+router.post('/kafka/updateDish', function (req, res) {
+
+  console.log("Request body is:" + req.body);
+  const request = {
+    req: req.body,
+    type: "updateDish"
+  }
+
+  console.log("updateDish API Called.....");
+  kafka.make_request(RESTAURANT_TOPIC, request, function (err, result) {
+    console.log('in result');
+    console.log(result);
     if (err) {
       console.log("Update of Dish failed : " + err);
       res.send("Update Failed");
-    }
-    else{
+    } else {
       console.log("1 Dish updated");
       res.send("Successful");
+    }
+  });
+});
+
+router.post('/kafka/createRestaurant', function (req, res) {
+
+  console.log("Request body is:" + req.body);
+  const request = {
+    req: req.body,
+    type: "createRestaurant"
+  }
+
+  console.log("createRestaurant API Called.....");
+  kafka.make_request(RESTAURANT_TOPIC, request, function (err, result) {
+    console.log('in result');
+    console.log(result);
+    if (err) {
+      internalError(res);
+    } else {
+      responseHandler(res, result);
     }
   });
 });

@@ -48,7 +48,7 @@ export default class RestaurantDisplay extends Component {
 
         dishesFromBackend = await getDishesbyResId(request);
         const result = await getFavourites(requestFavourites);
-        if (result) {
+        if (result.data) {
             currFavourites.push(...(JSON.parse(result)))
         }
         if (dishesFromBackend) {

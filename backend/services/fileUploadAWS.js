@@ -1,7 +1,6 @@
 var aws = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
-const config = require('../Config');
 
 const bucketName = "273-images-dump";
 

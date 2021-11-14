@@ -5,7 +5,7 @@ const connection = require('../resources.js');
 
 const { CUSTOMER_TOPIC } = require('../kafka/topics');
 var kafka = require('../kafka/client');
-const { checkAuth } = require("../utils/passport");
+const { checkAuth } = require("../Utils/passport");
 
 router.get('/kafka/getAllRestaurants', async (req, res) => {
   

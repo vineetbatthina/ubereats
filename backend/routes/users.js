@@ -9,7 +9,7 @@ const { USER_TOPIC } = require('../kafka/topics');
 const { responseHandler, internalError } = require('./responses');
 
 const jwt = require('jsonwebtoken');
-const { auth } = require("../utils/passport");
+const { auth } = require("../Utils/passport");
 auth();
 
 router.post('/api/imageUpload/:entity', upload.single('image'), function (req, res, next) {

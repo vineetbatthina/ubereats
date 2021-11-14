@@ -31,7 +31,25 @@ async function handle_request(msg, callback) {
         case "updateFavourites":
             handleUpdateFavourites(msg.req, callback);
             break;
+        case "getRestaurantsBasedonSearch":
+            handleGetRestaurantsBasedonSearch(msg.req, callback);
+            break;
     }
+}
+
+async function handleGetRestaurantsBasedonSearch(req, callback) {
+
+    Restaurants.find({store_location : new RegExp(req)}, (error, results) => {
+        if (error) {
+            console.log("Fetching of all restaurants failed : " + error);
+            callback(error, null);
+        }
+        else {
+            console.log("Successfully retrieved all restaurants");
+            callback(null, results);
+        }
+    });
+
 }
 
 async function handleGetAllRestaurants(req, callback) {
@@ -76,12 +94,14 @@ async function handleSendOrders(req, callback) {
     const newOrder = new Orders({
         cust_email_id: order.custEmailId,
         restaurant_id: order.restaurantId,
+        restaurant_name: order.restaurantName,
         dishes_ordered: order.dishes,
         delivery_address: order.deliveryAddress,
         order_timestamp: order.orderTimeStamp,
         payment_mode: order.paymentMode,
         order_price: order.totalPrice,
-        status: 'RECEIVED'
+        status: 'RECEIVED',
+        message : order.message ? order.message : null
     });
     newOrder.save((error, data) => {
         if (error) {
@@ -115,14 +135,14 @@ async function handleGetOrdersByCustEmail(req, callback) {
 
 async function handleGetCustomerProfileByEmailId(req, callback) {
 
-    console.log('Fetching for dishes of a restaurant....');
+    console.log('Fetching for customer profile....');
     CustomerProfiles.find({ email_id: req.emailId }, (error, results) => {
         if (error) {
-            console.log("Fetching of Orders failed : " + error);
+            console.log("Fetching of customer profile failed : " + error);
             callback(error, null);
         }
         else {
-            console.log("Successfully fetched Orders");
+            console.log("Successfully fetched customer profile");
             callback(null, results);
         }
     });
@@ -174,7 +194,7 @@ async function handleUpdateCustomerProfile(req, callback) {
             nick_name: customer.nickName,
             DOB: customer.dob,
             address: customer.address,
-            profile_img: customer.profileImg,
+            profile_img: customer.profilePictureUrl,
             favourites: customer.favourites
         }
     }, (err, res) => {

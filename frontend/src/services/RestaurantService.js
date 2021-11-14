@@ -3,12 +3,14 @@ import serverUrl from '../utils/clientconfig';
 
 export async function getAllRestaurants() {
 
-    const response = await fetch(`${serverUrl}/api/restuarants`);
+    const response = await fetch(`${serverUrl}/kafka/restuarants`);
     const data = await response.json();
     return data;
 }
 
 export async function createRestaurant(restuarant) {
+
+    const token = localStorage.getItem('token');
 
     const requestOptions = {
         method: 'POST',
@@ -33,6 +35,8 @@ export async function createRestaurant(restuarant) {
 
 export async function getRestaurantProfile(request) {
 
+    const token = localStorage.getItem('token');
+
     let resProfile = null;
     const requestOptions = {
         method: 'POST',
@@ -40,7 +44,7 @@ export async function getRestaurantProfile(request) {
         body: JSON.stringify(request)
     };
     try {
-        const fetchResponse = await fetch(`${serverUrl}/mongo/getRestaurantProfile`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/kafka/getRestaurantProfile`, requestOptions);
         const data = await fetchResponse.text();
         if (fetchResponse.status === 200) {
             resProfile = JSON.parse(data);
@@ -54,13 +58,15 @@ export async function getRestaurantProfile(request) {
 
 export async function saveRestaurantProfile(restaurantProfile) {
 
+    const token = localStorage.getItem('token');
+
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(restaurantProfile)
     };
     try {
-        const fetchResponse = await fetch(`${serverUrl}/mongo/saveRestaurantProfile`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/kafka/saveRestaurantProfile`, requestOptions);
         return fetchResponse.status;
     } catch (e) {
         console.log(e);
@@ -70,13 +76,15 @@ export async function saveRestaurantProfile(restaurantProfile) {
 
 export async function saveDish(dish) {
 
+    const token = localStorage.getItem('token');
+
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dish)
     };
     try {
-        const fetchResponse = await fetch(`${serverUrl}/api/saveDish`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/kafka/saveDish`, requestOptions);
         return fetchResponse.status;
     } catch (e) {
         console.log(e);
@@ -86,6 +94,8 @@ export async function saveDish(dish) {
 
 export async function getDishes(emailId) {
 
+    const token = localStorage.getItem('token');
+
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -93,7 +103,7 @@ export async function getDishes(emailId) {
     };
     let dishes = null;
     try {
-        const fetchResponse = await fetch(`${serverUrl}/api/getDishes`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/kafka/getDishes`, requestOptions);
         const data = await fetchResponse.json();
         if(fetchResponse.status===200){
             dishes = data;
@@ -106,6 +116,8 @@ export async function getDishes(emailId) {
 
 export async function getOrdersByResId(emailId) {
 
+    const token = localStorage.getItem('token');
+
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -113,7 +125,7 @@ export async function getOrdersByResId(emailId) {
     };
     let orders = null;
     try {
-        const fetchResponse = await fetch(`${serverUrl}/api/getOrdersByResId`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/kafka/getOrdersByResId`, requestOptions);
         const data = await fetchResponse.json();
         if(fetchResponse.status===200){
             orders = data;
@@ -126,13 +138,15 @@ export async function getOrdersByResId(emailId) {
 
 export async function updateOrder(request) {
 
+    const token = localStorage.getItem('token');
+
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(request)
     };
     try {
-        const fetchResponse = await fetch(`${serverUrl}/api/updateOrder`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/kafka/updateOrder`, requestOptions);
         let data = await fetchResponse;
         if(data.status === 200){
             return true;
@@ -148,13 +162,15 @@ export async function updateOrder(request) {
 
 export async function updateDish(request) {
 
+    const token = localStorage.getItem('token');
+
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(request)
     };
     try {
-        const fetchResponse = await fetch(`${serverUrl}/api/updateDish`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/kafka/updateDish`, requestOptions);
         let data = await fetchResponse;
         if(data.status === 200){
             return true;

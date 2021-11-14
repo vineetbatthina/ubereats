@@ -11,6 +11,7 @@ export const ActionTypes = {
     LOG_OUT : 'LOG_OUT',
 
     UPDATE_CART : 'UPDATE_CART',
-    STORE_LOCATION : 'STORE_LOCATION'
+    STORE_LOCATION : 'STORE_LOCATION',
+    RERENDER_DISH : 'RERENDER_DISH'
 }
   

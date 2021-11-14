@@ -32,7 +32,7 @@ export default class CustomerRestaurantsDisplay extends Component {
             console.log(localStorage.getItem('cust_location'));
             if (localStorage.getItem('cust_location')) {
                 restaurants.forEach((restaurant) => {
-                    restaurantMap.set(restaurant.restaurant_id, restaurant.store_name);
+                    restaurantMap.set(restaurant._id, restaurant.store_name);
                     console.log(restaurant.store_location);
                     console.log(localStorage.getItem('cust_location'));
                     if (restaurant.store_location === localStorage.getItem('cust_location')) {
@@ -248,8 +248,8 @@ export default class CustomerRestaurantsDisplay extends Component {
                         {
                             locationRestaurants.map((restaurant) => {
                                 return (
-                                    <div className="col-4" key={restaurant.restaurant_id}>
-                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant.restaurant_id} dishType ={ this.props.currFilters } pathName="/restaurantDisplayForCustomer" source="customer" />
+                                    <div className="col-4" key={restaurant._id}>
+                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant._id} dishType ={ this.props.currFilters } pathName="/restaurantDisplayForCustomer" source="customer" />
                                     </div>
                                 )
                             })
@@ -264,8 +264,8 @@ export default class CustomerRestaurantsDisplay extends Component {
                         {
                             searchedRestaurants.map((restaurant) => {
                                 return (
-                                    <div className="col-4" key={restaurant.restaurant_id}>
-                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant.restaurant_id} dishType ={ this.props.currFilters } pathName="/restaurantDisplayForCustomer" source="customer" />
+                                    <div className="col-4" key={restaurant._id}>
+                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant._id} dishType ={ this.props.currFilters } pathName="/restaurantDisplayForCustomer" source="customer" />
                                     </div>
                                 )
                             })
@@ -281,8 +281,8 @@ export default class CustomerRestaurantsDisplay extends Component {
                         {
                             restaurants.map((restaurant) => {
                                 return (
-                                    <div className="col-4" key={restaurant.restaurant_id}>
-                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant.restaurant_id} dishType ={ this.props.currFilters } pathName="/restaurantDisplayForCustomer" source="customer" />
+                                    <div className="col-4" key={restaurant._id}>
+                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant._id} dishType ={ this.props.currFilters } pathName="/restaurantDisplayForCustomer" source="customer" />
                                     </div>
                                 )
                             })

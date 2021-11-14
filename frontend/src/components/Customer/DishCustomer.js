@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { updateCart } from '../../_actions/index';
+import defaultDish from '../../images/default_dish_2.jpg';
 
 class DishCustomer extends Component {
 
@@ -151,7 +152,7 @@ class DishCustomer extends Component {
         return (
             <div>
                 <div className="card" style={{ width: '18rem' }}>
-                    <img src={this.props.dishImg} className="img-thumbnail" onError={(e) => { e.target.onerror = null; e.target.src = "../../images/default_dish.jpg" }} />
+                <img src={this.props.dishImg} className="img-thumbnail" onError={(e) => { console.log("Image error");e.target.onerror = null; e.target.src = defaultDish }} />
                     <div className="card-body">
                         <h5 className="card-title">{this.props.dishName}</h5>
                         <p className="card-text">{this.props.dishDescription}</p>
@@ -218,4 +219,11 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 
-export default connect(null, mapDispatchToProps)(DishCustomer);
+const mapStateToProps = state => {
+    console.log("Render value is: "+state.customerReducer.reRender);
+    return {
+        reRenderComponent : state.customerReducer.reRender
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(DishCustomer);

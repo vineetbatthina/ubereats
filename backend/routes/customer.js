@@ -2,13 +2,10 @@ const express = require('express');
 const router = express.Router();
 
 const connection = require('../resources.js');
-const Restaurants = require('../Models/Restaurants');
-const Dishes = require('../Models/Dishes');
-const Orders = require('../Models/Orders');
-const CustomerProfiles = require('../Models/CustomerProfiles');
 
 const { CUSTOMER_TOPIC } = require('../kafka/topics');
 var kafka = require('../kafka/client');
+const { checkAuth } = require("../utils/passport");
 
 router.get('/kafka/getAllRestaurants', async (req, res) => {
   
@@ -33,7 +30,7 @@ router.get('/kafka/getAllRestaurants', async (req, res) => {
   });
 });
 
-router.post('/kafka/getDishesbyResId', async (req, res) => {
+router.post('/kafka/getDishesbyResId',checkAuth, async (req, res) => {
   
   console.log("Request body is:" + req.body);
 
@@ -57,7 +54,7 @@ router.post('/kafka/getDishesbyResId', async (req, res) => {
   });
 });
 
-router.post('/kafka/sendOrders', async (req, res) => {
+router.post('/kafka/sendOrders',checkAuth, async (req, res) => {
   
   console.log("Request body is:" + req.body);
 
@@ -81,7 +78,7 @@ router.post('/kafka/sendOrders', async (req, res) => {
   });
 });
 
-router.post('/kafka/getOrdersByCustEmail', async (req, res) => {
+router.post('/kafka/getOrdersByCustEmail',checkAuth, checkAuth, (req, res) => {
   
   console.log("Request body is:" + req.body);
 
@@ -105,7 +102,7 @@ router.post('/kafka/getOrdersByCustEmail', async (req, res) => {
   });
 });
 
-router.post('/kafka/getCustomerProfileByEmailId', async (req, res) => {
+router.post('/kafka/getCustomerProfileByEmailId',checkAuth, async (req, res) => {
   
   console.log("Request body is:" + req.body);
 
@@ -129,7 +126,7 @@ router.post('/kafka/getCustomerProfileByEmailId', async (req, res) => {
   });
 });
 
-router.post('/kafka/saveCustomerProfile', async (req, res) => {
+router.post('/kafka/saveCustomerProfile',checkAuth, async (req, res) => {
   
   console.log("Request body is:" + req.body);
 
@@ -151,7 +148,7 @@ router.post('/kafka/saveCustomerProfile', async (req, res) => {
   });
 });
 
-router.post('/kafka/updateCustomerProfile', async (req, res) => {
+router.post('/kafka/updateCustomerProfile',checkAuth, async (req, res) => {
   
   console.log("Request body is:" + req.body);
 
@@ -173,19 +170,49 @@ router.post('/kafka/updateCustomerProfile', async (req, res) => {
   });
 });
 
-//TBC
-router.post('/api/getRestaurantsBasedonSearch', async (req, res) => {
-  const searchString = req.body.searchString.concat('%');
-  const select_restaurants_based_on_search = `SELECT DISTINCT r.restaurant_id,r.store_name,r.store_location,r.owner_email,r.description,r.timings,r.phone,r.street,r.state,r.country,r.pincode,r.restaurant_img,r.delivery_type,r.dishes_type FROM restaurants r LEFT OUTER JOIN dishes m ON m.restaurant_id = r.restaurant_id WHERE (m.dish_name LIKE ? OR m.dish_description LIKE ? OR r.store_name LIKE ? OR r.store_location LIKE ? OR r.cuisine LIKE ?);`
-  await connection.query(select_restaurants_based_on_search, [searchString,searchString,searchString,searchString,searchString], async function (error, results) {
+// //TBC
+// router.post('/api/getRestaurantsBasedonSearch',checkAuth, async (req, res) => {
+//   const searchString = req.body.searchString.concat('%');
+//   const select_restaurants_based_on_search = `SELECT DISTINCT r.restaurant_id,r.store_name,r.store_location,r.owner_email,r.description,r.timings,r.phone,r.street,r.state,r.country,r.pincode,r.restaurant_img,r.delivery_type,r.dishes_type FROM restaurants r LEFT OUTER JOIN dishes m ON m.restaurant_id = r.restaurant_id WHERE (m.dish_name LIKE ? OR m.dish_description LIKE ? OR r.store_name LIKE ? OR r.store_location LIKE ? OR r.cuisine LIKE ?);`
+//   await connection.query(select_restaurants_based_on_search, [searchString,searchString,searchString,searchString,searchString], async function (error, results) {
+//     if (error) {
+//       console.log("Not Successfull");
+//       res.send(JSON.stringify(error));
+//     }
+//     else {
+//       console.log('Successfully Retrieved the restaurants based on search string the customer profile');
+//       res.send(JSON.stringify(results));
+//     }
+//   });
+// });
+
+router.post('/kafka/getRestaurantsBasedonSearch', async (req, res) => {
+
+  
+  
+  console.log("Request body in getRestaurantsBasedonSearch is :" + req.body);
+  const searchString = req.body.searchString;
+
+  const request = {
+    req: req.body.searchString,
+    type: "getRestaurantsBasedonSearch"
+  }
+
+  console.log("getRestaurantsBasedonSearch API Called.....");
+  kafka.make_request(CUSTOMER_TOPIC, request, function (error, results) {
     if (error) {
-      console.log("Not Successfull");
-      res.send(JSON.stringify(error));
-    }
-    else {
-      console.log('Successfully Retrieved the restaurants based on search string the customer profile');
-      res.send(JSON.stringify(results));
-    }
+      res.writeHead(500, {
+          'Content-Type': 'text/plain'
+      })
+      res.end();
+  }
+  else {
+      console.log('Successfully Retrieved the Favourites for Customer');
+      res.writeHead(200, {
+          'Content-Type': 'application/json'
+      });
+      res.end(JSON.stringify(results));
+  }
   });
 });
 
@@ -216,7 +243,7 @@ router.post('/kafka/getFavourites', async (req, res) => {
   });
 });
 
-router.post('/kafka/updateFavourites', async (req, res) => {
+router.post('/kafka/updateFavourites',checkAuth, async (req, res) => {
   
   console.log("Request body is:" + req.body);
 
@@ -254,7 +281,7 @@ router.post('/api/getRestaurantsBasedonIds', async (req, res)=>{
   });
 });
 
-router.post('/kafka/getCustomerProfileByEmailId', async (req, res) => {
+router.post('/kafka/getCustomerProfileByEmailId',checkAuth, async (req, res) => {
   
   console.log("Request body is:" + req.body);
 

@@ -174,6 +174,10 @@ export default class Orders extends Component {
                             <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="DELIVERED" onChange={this.displayOrdersByStatus} checked={(this.state.changedStatus) ? ((this.state.changedStatus === "DELIVERED") ? true : false) : false} />
                             <label className="form-check-label" htmlFor="inlineRadio3">Delivered</label>
                         </div>
+                        <div className="form-check form-check-inline">
+                            <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="CANCELLED" onChange={this.displayOrdersByStatus} checked={(this.state.changedStatus) ? ((this.state.changedStatus === "CANCELLED") ? true : false) : false} />
+                            <label className="form-check-label" htmlFor="inlineRadio3">Cancelled</label>
+                        </div>
                     </div>
 
                     <div className="container">
@@ -190,12 +194,12 @@ export default class Orders extends Component {
                                 {
                                     this.state.filteredOrders.map((order) => {
                                         return (
-                                            <tr key={order.order_id}>
+                                            <tr key={order._id}>
                                                 <td>{order.cust_email_id}</td>
                                                 <td>${order.order_price}</td>
                                                 <td>
                                                     <div className="row" >
-                                                        <div className="col-2" hidden={(order.status==="DELIVERED") ? true : false} onClick={() => {
+                                                        <div className="col-2" hidden={(order.status==="DELIVERED") || (order.status==="CANCELLED")  ? true : false} onClick={() => {
                                                             this.setState({
                                                                 currentOrder: order,
                                                                 editStatusModalVisible: true,
@@ -265,6 +269,13 @@ export default class Orders extends Component {
                                                 <label className="form-check-label" htmlFor="inlineRadio3">Delivered</label>
                                             </div>
                                     }
+                                    {
+                                        (this.state.currentOrder.status === 'CANCELLED') ? null :
+                                            <div className="form-check form-check-inline">
+                                                <input className="form-check-input" type="radio" name="status_change_radios" id="status_change_radio5" value="CANCELLED" />
+                                                <label className="form-check-label" htmlFor="inlineRadio3">Cancelled</label>
+                                            </div>
+                                    }
                                 </div>
                             </center>
                         </Modal.Body>
@@ -321,7 +332,7 @@ export default class Orders extends Component {
                                             {
                                                 JSON.parse(this.state.currentOrderDishes).map((dish) => {
                                                     return (
-                                                        <div key={dish.dishId}>     
+                                                        <div key={dish._id}>     
                                                                 {dish.dishName}
                                                                 <div className="col">
                                                                    Quantity: {dish.dish_quantity}

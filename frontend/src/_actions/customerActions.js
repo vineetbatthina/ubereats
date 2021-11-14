@@ -1,5 +1,5 @@
 import { ActionTypes } from '../_constants';
-import {createUser} from '../services/UserService'
+import {createUser} from '../services/UserService';
 
 export const addCustomerUser = (payload) => {
 
@@ -28,6 +28,17 @@ export const addCustomerUser = (payload) => {
         }
     }
 
+}
+
+export const reRenderDishes = () =>{
+    return async dispatch => {
+        console.log("Rerendering dishes component");
+        let payload = '';
+        dispatch({
+            type: ActionTypes.RERENDER_DISH,
+            payload
+        })
+    }
 }
 
 export const updateCart = (payload) => {

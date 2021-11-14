@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
+import defaultRestaurant from '../../images/restaurant_2.jpg';
 
 export default class RestaurantCard extends Component {
 
@@ -24,7 +25,7 @@ export default class RestaurantCard extends Component {
                             dishType : this.props.dishType
                         }
                     }}>
-                    <img src={this.props.restaurantImg} className="img-thumbnail" onError={(e) => { e.target.onerror = null; e.target.src = "../../images/default_dish.jpg" }} />
+                    <img src={this.props.restaurantImg} className="img-thumbnail" onError={(e) => { console.log("Image error");e.target.onerror = null; e.target.src = defaultRestaurant }} />
                 </Link>
                 <div className="card-body">
                     <h5 className="card-title">{this.props.restaurantName}</h5>

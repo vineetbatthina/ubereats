@@ -160,9 +160,9 @@ export default class RestaurantMenu extends Component {
                         {
                             this.state.dishes.map((dish) => {
                                 return (
-                                    <div className="col-3" key={dish.dish_id} onClick={() => {
+                                    <div className="col-3" key={dish._id} onClick={() => {
                                         this.setState({
-                                            currDishId: dish.dish_id,
+                                            currDishId: dish._id,
                                             currDishName: dish.dish_name,
                                             currDishDescription: dish.dish_description,
                                             currDishPrice: dish.dish_price,

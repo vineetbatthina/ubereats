@@ -5,7 +5,7 @@ Cors = require("cors"),
   port = 3080;
 
 app.use(bodyParser.json());
-app.use(Cors());
+app.use(Cors({exposedHeaders: 'token'}));
 
 const customer_router = require('./routes/customer');
 app.use(customer_router);

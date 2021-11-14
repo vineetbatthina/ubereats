@@ -33,12 +33,12 @@ class UserLogin extends Component {
 
     render() {
         let redirectComponent = null;
-        if (this.props.loginStatus === true) {
+        if (this.props.loginStatus === true && this.props.token.length>0) {
             alert("Login is successful");
             localStorage.setItem('isLoggedIn', this.props.loginStatus);
             localStorage.setItem('isRestaurantOwner', this.props.isRestaurantOwner);
             localStorage.setItem('emailId', this.state.emailId);
-
+            localStorage.setItem("token", this.props.token);
             const cart_dishes = {
                 restaurantId: '',
                 dishes: []
@@ -112,7 +112,8 @@ const mapDispatchToProps = (dispatch) => {
 const mapStateToProps = state => {
     return {
         loginStatus: state.userReducer.loginStatus,
-        isRestaurantOwner: state.userReducer.isRestaurantOwner
+        isRestaurantOwner: state.userReducer.isRestaurantOwner,
+        token : state.userReducer.token
     };
 };
 

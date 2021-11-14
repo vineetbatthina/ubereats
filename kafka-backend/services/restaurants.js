@@ -162,7 +162,7 @@ async function handleUpdateOrder(req, callback) {
 
     console.log('Updating the order');
 
-    Orders.updateOne({ id: order.orderId }, {
+    Orders.updateOne({ _id: order._id }, {
         $set: {
             status: order.status
         }

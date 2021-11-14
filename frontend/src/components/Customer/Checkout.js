@@ -8,6 +8,7 @@ import { Redirect } from 'react-router-dom';
 
 import { updateCart } from '../../_actions/index';
 import CustomerNavBar from './CustomerNavBar';
+import { getRestaurantProfileByID } from '../../services/CustomerService';
 
 class Checkout extends Component {
 
@@ -20,14 +21,15 @@ class Checkout extends Component {
             emailId: '',
             phone: '',
             street: '',
-            city:'',
+            city: '',
             state: '',
             country: '',
             pincode: '',
             dishes: [],
             cartPrice: 0,
             totalPrice: 0,
-            orderSuccessfull: false
+            orderSuccessfull: false,
+            message: ""
         }
     }
 
@@ -35,11 +37,16 @@ class Checkout extends Component {
         const modeofPayment = document.querySelector('input[name="inlineRadioOptions"]:checked').value;
 
         const currentDate = new Date();
+        let currRestaurant = {
+            restaurantId: this.props.location.state.restaurantId
+        };
+        const resultRestaurant = await getRestaurantProfileByID(currRestaurant);
 
-        if(this.state.street!=='' && this.state.state!=='' && this.state.city!=='' && this.state.country!=='' && this.state.pincode!=='' ){
+        if (this.state.street !== '' && this.state.state !== '' && this.state.city !== '' && this.state.country !== '' && this.state.pincode !== '') {
             const order = {
                 custEmailId: localStorage.getItem('emailId'),
                 restaurantId: this.props.location.state.restaurantId,
+                restaurantName : resultRestaurant.store_name,
                 dishes: JSON.stringify(this.state.dishes),
                 deliveryAddress: JSON.stringify({
                     street: this.state.street,
@@ -51,32 +58,33 @@ class Checkout extends Component {
                 orderTimeStamp: String(currentDate),
                 paymentMode: modeofPayment,
                 totalPrice: this.state.totalPrice,
+                message: this.state.message
             }
-    
+
             console.log(order);
-    
+
             let order_successful = await sendOrders(order);
-    
+
             if (order_successful) {
                 alert("Order Placed Successfully");
                 const cart_dishes = {
                     restaurantId: '',
-                    dishes : []
+                    dishes: []
                 }
-                localStorage.setItem('cart_dishes',JSON.stringify(cart_dishes));
+                localStorage.setItem('cart_dishes', JSON.stringify(cart_dishes));
                 this.props.updateCart(localStorage.getItem("cart_dishes"));
                 this.setState({
-                    orderSuccessfull : true
+                    orderSuccessfull: true
                 });
             }
             else {
                 alert("Constact Administrator");
             }
         }
-        else{
+        else {
             alert("Enter all address fields.");
         }
-        
+
     }
 
     async componentDidMount() {
@@ -97,7 +105,7 @@ class Checkout extends Component {
             const address = JSON.parse(customerProfile.address);
             this.setState({
                 street: (address.street) ? address.street : '',
-                city : (address.city) ? address.city : '',
+                city: (address.city) ? address.city : '',
                 state: (address.state) ? address.state : '',
                 country: (address.country) ? address.country : '',
                 pincode: (address.pincode) ? address.pincode : '',
@@ -106,10 +114,10 @@ class Checkout extends Component {
                 totalPrice: totalPrice
             })
         }
-        else{
+        else {
             this.setState({
                 street: '',
-                city : '',
+                city: '',
                 state: '',
                 country: '',
                 pincode: '',
@@ -170,6 +178,16 @@ class Checkout extends Component {
                         </div>
                         <br />
                     </div>
+                    <div className="row" style={{ width: "60%"}}>
+                            <div className="col">
+                                <div>
+                                    <input type="text" className="form-control" placeholder=" Let us know if you've got any special instructions. We got you! " value={this.state.message} onChange={(e) => this.setState({ message: e.target.value })} />
+                                </div>
+                            </div>
+                            <div className="col-11">
+                                
+                            </div>
+                    </div>
                     <div className="row">
                         <div className="row">
                             <div className="col">
@@ -220,7 +238,10 @@ class Checkout extends Component {
                                 </div>
                             </div>
                         </div>
+
+
                     </div>
+
                 </div>
                 <div className="col-3" style={{ margin: "2% 0 0 2%" }}>
                     <div className="row">
@@ -252,7 +273,7 @@ class Checkout extends Component {
                             <button style={{ color: 'white' }} onClick={this.placeOrder}> Place Order </button>
                         </div>
 
-                        <Link to = "/custdashboard" style = {{color: 'inherit'}} >
+                        <Link to="/custdashboard" style={{ color: 'inherit' }} >
                             <div className="row" style={{ marginTop: '2%', backgroundColor: 'Black', color: 'white' }}>
                                 <button style={{ color: 'white' }}> Missed Something ? Go to Menu </button>
                             </div>
@@ -270,4 +291,4 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 
-export default  connect(null, mapDispatchToProps)(Checkout);
+export default connect(null, mapDispatchToProps)(Checkout);

@@ -4,7 +4,8 @@ const initialState = {
     loginStatus: false,
     isRestaurantOwner: '',
     users: [],
-    signupStatus: ''
+    signupStatus: '',
+    token : ''
 };
 
 const userReducer = (state = initialState, action) => {
@@ -13,7 +14,8 @@ const userReducer = (state = initialState, action) => {
         case ActionTypes.USER_LOGIN_SUCCESSFUL:
             return Object.assign({}, state, {
                 loginStatus: true,
-                isRestaurantOwner: action.payload.restaurantOwner,
+                isRestaurantOwner: JSON.parse(action.payload.restaurantOwner).restaurantOwner,
+                token: JSON.parse(action.payload.restaurantOwner).token
             });
         case ActionTypes.USER_LOGIN_FAILED_SUCCESSFUL:
             return Object.assign({}, state, {

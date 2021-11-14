@@ -5,6 +5,6 @@ import { Provider } from "react-redux";
 import store from "./_store";
 
 ReactDOM.render(
-    <Provider store={store} > <App /> </Provider>,
+    <Provider crossorigin store={store} > <App /> </Provider>,
     document.getElementById('root')
 );

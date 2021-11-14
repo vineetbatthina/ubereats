@@ -26,7 +26,7 @@ export async function createUser(user) {
 
 export async function getAllRestaurants() {
     let data = null;
-    const response = await fetch(`${serverUrl}/mongo/getAllRestaurants`);
+    const response = await fetch(`${serverUrl}/kafka/getAllRestaurants`);
     data = await response.json();
     return data;
 }

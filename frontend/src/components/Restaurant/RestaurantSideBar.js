@@ -31,7 +31,10 @@ export default class RestaurantSideBar extends Component {
 
     handleLogout(event) {
         event.preventDefault();
-        window.location.href = '/userLogin';
+        localStorage.setItem('isLoggedIn', false);
+        localStorage.setItem('isRestaurantOwner', '');
+        localStorage.setItem('emailId', '');
+        window.location.href = '/';
     }
 
     render() {

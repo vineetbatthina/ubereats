@@ -1,12 +1,13 @@
 var aws = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
+const config = require('../Config');
 
-const bucketName = "ubereatsdb";
+const bucketName = "273-images-dump";
 
 aws.config.update({
-  accessKeyId: 'AKIA6BS2OQIWUPIG3B27',
-  secretAccessKey: '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',
+  accessKeyId: 'AKIA6KDS4SHUBLQUX345',
+  secretAccessKey: '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',
   region: 'us-east-2',
 });
 

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import defaultDish from '../../images/default_dish_2.jpg';
 
 export default class Dish extends Component {
 
@@ -9,7 +10,7 @@ export default class Dish extends Component {
     render() {
         return (
             <div className="card" style={{ width: '18rem' }}>
-                <img src={this.props.dishImg} className="img-thumbnail" onError={(e)=>{e.target.onerror = null; e.target.src="../../images/default_dish.jpg"}}/>
+                <img src={this.props.dishImg} className="img-thumbnail" onError={(e) => { console.log("Image error");e.target.onerror = null; e.target.src = defaultDish }} />
                 <div className="card-body">
                     <h5 className="card-title">{this.props.dishName}</h5>
                     <p className="card-text">{this.props.dishDescription}</p>

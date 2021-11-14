@@ -5,10 +5,14 @@ import '../../css/Customer.css';
 import CustomerSideBar from './CustomerSideBar';
 import CustomerProfile from './CustomerProfile';
 import { BiCartAlt } from "react-icons/bi";
+import { MdDelete } from "react-icons/md";
 import { connect } from 'react-redux';
 import { Modal } from 'react-bootstrap';
 import { Link } from "react-router-dom";
 import Orders from './Orders';
+
+import {reRenderDishes} from '../../_actions/customerActions';
+import { updateCart } from '../../_actions/index';
 
 class CustomerNavBar extends Component {
 
@@ -22,7 +26,8 @@ class CustomerNavBar extends Component {
             restaurantName: '',
             cartPrice: '',
             cartDishes: [],
-            restaurantId : ''
+            restaurantId : '',
+            quantity : 1
         };
 
         this.loadSideNavBar = this.loadSideNavBar.bind(this);
@@ -67,6 +72,7 @@ class CustomerNavBar extends Component {
     }
 
     closePopup = (e) => {
+        this.props.reRenderDishes();
         this.setState({
             showCart: false
         });
@@ -103,7 +109,74 @@ class CustomerNavBar extends Component {
             cartDishes: cartDishes.dishes
         });
     }
-    
+
+    deleteDish(currDish){
+
+        let currCartItems = JSON.parse(localStorage.getItem('cart_dishes')).dishes;
+        
+        let latestCartItems = [];
+        currCartItems.map( (dish) =>  {
+            if(dish.dishId != currDish.dishId){
+                latestCartItems.push(dish);
+            };
+        })
+
+        const cart_dishes = {
+            restaurantId: JSON.parse(localStorage.getItem('cart_dishes')).restaurantId,
+            dishes: latestCartItems
+        }
+        localStorage.setItem('cart_dishes', JSON.stringify(cart_dishes));
+        this.props.updateCart(localStorage.getItem("cart_dishes"));
+
+        let cartPrice = 0;
+        if (cart_dishes.dishes) {
+            latestCartItems.map((dish) => {
+                const totalPriceofDish = parseInt(dish.dish_price) * parseInt(dish.dish_quantity);
+                cartPrice += totalPriceofDish;
+            })
+        }
+
+        this.setState({
+            showCart:true,
+            cartPrice : cartPrice
+        });
+    }
+
+    modifyQuantity = (event,currDish) => {
+        let quantity = parseInt(event.target.value);
+        
+        let currCartItems = JSON.parse(localStorage.getItem('cart_dishes')).dishes;
+        
+        let latestCartItems = [];
+        currCartItems.map( (dish) =>  {
+            if(dish.dishId === currDish.dishId){
+                dish.dish_quantity = quantity;
+            };
+            latestCartItems.push(dish);
+        })
+
+        const cart_dishes = {
+            restaurantId: JSON.parse(localStorage.getItem('cart_dishes')).restaurantId,
+            dishes: latestCartItems
+        }
+        localStorage.setItem('cart_dishes', JSON.stringify(cart_dishes));
+        this.props.updateCart(localStorage.getItem("cart_dishes"));
+
+        let cartPrice = 0;
+        if (cart_dishes.dishes) {
+            latestCartItems.map((dish) => {
+                const totalPriceofDish = parseInt(dish.dish_price) * parseInt(dish.dish_quantity);
+                cartPrice += totalPriceofDish;
+            })
+        }
+
+        this.setState({
+            item_quantity: quantity,
+            showCart:true,
+            cartPrice : cartPrice
+        });
+    };
+
     render() {
 
         return (
@@ -139,6 +212,7 @@ class CustomerNavBar extends Component {
                                         <th scope="col">Dish</th>
                                         <th scope="col">Price</th>
                                         <th scope="col">Quantity</th>
+                                        <th scope="col">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -148,7 +222,12 @@ class CustomerNavBar extends Component {
                                                 <tr key={dish.dishId}>
                                                     <td>{dish.dishName}</td>
                                                     <td>${dish.dish_price}</td>
-                                                    <td>{dish.dish_quantity}</td>
+                                                    <td><input type="number" name="Item Name" id="item_quantity" min="1" max="10" width="10%" onChange={(event) => {
+                                                        this.modifyQuantity(event,dish);
+                                                    }} defaultValue={dish.dish_quantity} autoFocus></input></td>
+                                                    <td onClick={ () =>  {
+                                                        this.deleteDish(dish);
+                                                    }}><MdDelete /></td>
                                                 </tr>
                                             )
                                         })
@@ -190,4 +269,11 @@ const mapStateToProps = state => {
     };
 };
 
-export default connect(mapStateToProps)(CustomerNavBar);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        reRenderDishes : () => dispatch(reRenderDishes()),
+        updateCart: (payload) => dispatch(updateCart(payload))
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(CustomerNavBar);

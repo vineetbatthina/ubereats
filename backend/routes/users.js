@@ -3,9 +3,14 @@ const router = express.Router();
 const { upload } = require('../services/fileUploadAWS');
 const Users = require('../Models/UserModel');
 var kafka = require('../kafka/client');
+const { secret } = require('../Utils/config');
 
 const { USER_TOPIC } = require('../kafka/topics');
 const { responseHandler, internalError } = require('./responses');
+
+const jwt = require('jsonwebtoken');
+const { auth } = require("../utils/passport");
+auth();
 
 router.post('/api/imageUpload/:entity', upload.single('image'), function (req, res, next) {
   res.send({ imageUrl: req.file.location });
@@ -48,11 +53,17 @@ router.post('/kafka/login', function (req, res) {
       res.end("Error Occured");
     }
     if (user) {
-      res.cookie('cookie', user.user_name, { maxAge: 900000, httpOnly: false, path: '/' });
-      res.writeHead(200, user.restaurant_owner, {
+      const payload = { _id: user._id, username: user.user_name };
+      const token = jwt.sign(payload, secret);
+
+      res.writeHead(200, JSON.stringify({
+        restaurantOwner: user.restaurant_owner,
+        token : "JWT " + token
+      }), {
         'Content-Type': 'text/plain'
       });
-      res.end("SUCCESSFULL LOGIN");
+      res.end("Successfull");
+
     }
     else {
       res.writeHead(401, {

@@ -88,7 +88,7 @@ class LandingPage extends React.Component {
 
       const restaurantMap = new Map(JSON.parse(localStorage.restaurantMap));
       restaurants.forEach((restaurant) => {
-        restaurantMap.set(restaurant.restaurant_id, restaurant.store_name)
+        restaurantMap.set(restaurant._id, restaurant.store_name)
       })
       localStorage.restaurantMap = JSON.stringify(Array.from(restaurantMap));
     }
@@ -116,8 +116,8 @@ class LandingPage extends React.Component {
               {
                 this.state.nearByRestaurants.map((restaurant) => {
                   return (
-                    <div className="col" key={restaurant.restaurant_id}>
-                      <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForGuest" source="guest" />
+                    <div className="col" key={restaurant._id}>
+                      <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant._id} pathName="/restaurantDisplayForGuest" source="guest" />
                     </div>
                   )
                 })
@@ -132,8 +132,8 @@ class LandingPage extends React.Component {
               {
                 this.state.otherRestaurants.map((restaurant) => {
                   return (
-                    <div className="col-3" key={restaurant.restaurant_id}>
-                      <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForGuest" source="guest" />
+                    <div className="col-3" key={restaurant._id}>
+                      <RestaurantCard restaurantName={restaurant.store_name} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant._id} pathName="/restaurantDisplayForGuest" source="guest" />
                     </div>
                   )
                 })

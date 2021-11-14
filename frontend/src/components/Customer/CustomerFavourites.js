@@ -52,8 +52,8 @@ export default class CustomerFavourites extends Component {
                         {
                             this.state.favRestaurants.map((restaurant) => {
                                 return (
-                                    <div className="col-3" key={restaurant.restaurant_id}>
-                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant.restaurant_id} pathName="/restaurantDisplayForCustomer" source="customer" />
+                                    <div className="col-3" key={restaurant._id}>
+                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant._id} pathName="/restaurantDisplayForCustomer" source="customer" />
                                     </div>
                                 )
                             })

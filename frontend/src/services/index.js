@@ -1,5 +1,4 @@
 import serverUrl from "../utils/clientconfig";
-const TOKEN_KEY = 'jwt';
 
 export const login = async (credentials) => {
     const requestOptions = {
@@ -15,7 +14,7 @@ export const login = async (credentials) => {
     }
     console.log("User Trying to Login");
     try {
-        const fetchResponse = await fetch(`${serverUrl}/mongo/login`, requestOptions);
+        const fetchResponse = await fetch(`${serverUrl}/kafka/login`, requestOptions);
         const data = await fetchResponse;
         if(data.status === 200 ){
             response.restaurantOwner = data.statusText;
@@ -36,16 +35,4 @@ export const login = async (credentials) => {
         response.code = -1;
         return response;
     }
-}
-
-export const logout = () => {
-    localStorage.removeItem(TOKEN_KEY);
-}
-
-export const isLogin = () => {
-    if (localStorage.getItem(TOKEN_KEY)) {
-        return true;
-    }
-
-    return false;
 }

@@ -4,7 +4,9 @@ import '../css/Generic.css';
 import { getAllRestaurants } from "../services/UserService";
 import RestaurantCard from "./Common/RestaurantCard";
 import LandingNavBar from './LandingNavBar';
-import { connect } from 'react-redux';
+
+import { withApollo } from 'react-apollo';
+import { GET_ALL_RESTAURANTS } from '../queries/queries';
 
 class LandingPage extends React.Component {
 
@@ -52,7 +54,7 @@ class LandingPage extends React.Component {
     this.setState({
       nearByRestaurants: nearByRestaurants,
       otherRestaurants: otherRestaurants,
-      locationAvailable: (location!=='') ? true : false 
+      locationAvailable: (location !== '') ? true : false
     })
 
   }
@@ -61,21 +63,29 @@ class LandingPage extends React.Component {
     const initMap = new Map();
     localStorage.restaurantMap = JSON.stringify(Array.from(initMap));
     const locationAvailable = (localStorage.getItem('location')) ? true : false;
-    const restaurants = await getAllRestaurants();
-    const nearByRestaurants = [];
+    let restaurants = [];
+    this.props.client.query({
+      query: GET_ALL_RESTAURANTS,
+    }).then(response => {
+      console.log("Response: ", response);
+      response.data.getAllRestaurants.map((restaurant) =>{
+        restaurants.push(restaurant);
+      });
+      const nearByRestaurants = [];
     const otherRestaurants = [];
 
+    console.log(restaurants);
     if (restaurants) {
 
-        restaurants.forEach((restaurant) => {
-          if (restaurant.store_location === localStorage.getItem('location')) {
-            nearByRestaurants.push(restaurant);
-          }
-          else {
-            otherRestaurants.push(restaurant);
-          }
-        })
-      
+      restaurants.forEach((restaurant) => {
+        if (restaurant.store_location === localStorage.getItem('location')) {
+          nearByRestaurants.push(restaurant);
+        }
+        else {
+          otherRestaurants.push(restaurant);
+        }
+      })
+
 
       this.setState({
         restaurants: restaurants,
@@ -92,8 +102,9 @@ class LandingPage extends React.Component {
       })
       localStorage.restaurantMap = JSON.stringify(Array.from(restaurantMap));
     }
-
-    console.log(localStorage.restaurantMap);
+    }).catch(error => {
+      console.log("In error"+ error);
+    })
   }
 
   render() {
@@ -124,7 +135,7 @@ class LandingPage extends React.Component {
               }
             </div>
           </div>
-          <div hidden={this.state.otherRestaurants.length===0}>
+          <div hidden={this.state.otherRestaurants.length === 0}>
             <div>
               <h2>Our Restaurant Partners </h2>
             </div>
@@ -148,10 +159,4 @@ class LandingPage extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    location: state.userReducer.location
-  };
-};
-
-export default connect(mapStateToProps)(LandingPage)
+export default withApollo(LandingPage);

@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import '../../css/Generic.css';
-import { getRestaurantProfile, saveRestaurantProfile, uploadRestaurantImgtoS3 } from '../../services/RestaurantService';
+import { uploadRestaurantImgtoS3 } from '../../services/RestaurantService';
 import RestaurantNavBar from './RestaurantNavBar';
 
-export default class RestaurantProfile extends Component {
+import { withApollo } from 'react-apollo';
+import { GET_PROFILE_QUERY } from '../../queries/queries';
+import {UPDATE_PROFILE_QUERY} from '../../mutations/mutations';
+
+class RestaurantProfile extends Component {
 
     constructor(props) {
         super(props);
@@ -45,7 +49,7 @@ export default class RestaurantProfile extends Component {
             restaurantImgUrl = response.data.imageUrl;
             console.log(restaurantImgUrl);
         }
-        else{
+        else {
             restaurantImgUrl = this.state.restaurantImgUrl;
         }
 
@@ -59,40 +63,44 @@ export default class RestaurantProfile extends Component {
         if (this.state.isPickupChecked) {
             deliveryType.push("PICKUP");
         }
-        if(this.state.isVegChecked){
+        if (this.state.isVegChecked) {
             dishesType.push("VEGAN");
         }
-        if(this.state.isNonVegChecked){
+        if (this.state.isNonVegChecked) {
             dishesType.push("NONVEG");
         }
 
-        const restaurantProfile = {
-            restaurantName: this.state.restaurantName,
-            location: this.state.location,
-            description: this.state.description,
-            cuisine: this.state.cuisine,
-            timings: this.state.timings,
-            emailId: this.state.emailId,
-            phone: this.state.phone,
-            deliveryType: String(deliveryType),
-            dishesType: String(dishesType),
-            street: this.state.street,
-            state: this.state.state,
-            country: this.state.country,
-            restaurantImgUrl : restaurantImgUrl,
-            pincode: parseInt(this.state.pincode)
-        };
-        const response = await saveRestaurantProfile(restaurantProfile);
-        if (response === 200) {
-            this.setState({
-                saveMessege: false
+        this.props.client.mutate({
+            mutation: UPDATE_PROFILE_QUERY,
+            variables: {
+                store_name: this.state.restaurantName,
+                store_location: this.state.location,
+                owner_email: this.state.emailId,
+                description: this.state.description,
+                restaurant_img: restaurantImgUrl,
+                timings: this.state.timings,
+                phone: this.state.phone,
+                street: this.state.street,
+                state: this.state.country,
+                country: this.state.country,
+                pincode: this.state.pincode,
+                cuisine: this.state.cuisine,
+                delivery_type: String(deliveryType),
+                dishes_type: String(dishesType)
+            }
+        })
+            .then(response => {
+                console.log("inside success")
+                console.log("response in update profile owner ", response.data);
+                this.setState({
+                    saveMessege: false
+                })
+                document.getElementById('save_messege').innerHTML = "Successfully Saved your Profile !!!";
             })
-            document.getElementById('save_messege').innerHTML = "Successfully Saved your Profile !!!";
-        }
-        else {
-
-        }
-
+            .catch(error => {
+                console.log("In error");
+                console.log(error);
+            })
     }
 
     async componentDidMount() {
@@ -103,18 +111,24 @@ export default class RestaurantProfile extends Component {
         catch (error) {
             console.log(error);
         }
-        const request = {
-            emailId: emailId
-        }
-        const restaurantProfile = await getRestaurantProfile(request);
-        if (restaurantProfile) {
+
+        this.props.client.query({
+            query: GET_PROFILE_QUERY,
+            variables: {
+                owner_email: emailId
+            }
+        }).then(response => {
+            console.log("Response: ", response);
+
+            const restaurantProfile = response.data.restaurantProfile;
+
             let isDeliveryChecked = false;
             let isPickupChecked = false;
             let isVegChecked = false;
             let isNonVegChecked = false;
             if (restaurantProfile.delivery_type) {
                 let delivery_types = restaurantProfile.delivery_type.split(",");
-                
+
                 delivery_types.map((type) => {
                     if (type === "DELIVERY") {
                         isDeliveryChecked = true;
@@ -123,18 +137,18 @@ export default class RestaurantProfile extends Component {
                         isPickupChecked = true;
                     }
                 })
-                
+
             }
 
             if (restaurantProfile.dishes_type) {
-                
+
                 let dishTypes = restaurantProfile.dishes_type.split(",");
-                
+
                 dishTypes.map((type) => {
                     if (type === "VEGAN") {
                         isVegChecked = true;
                     }
-                    else if(type === "NONVEG"){
+                    else if (type === "NONVEG") {
                         isNonVegChecked = true;
                     }
                 })
@@ -151,7 +165,7 @@ export default class RestaurantProfile extends Component {
                 isNonVegChecked: isNonVegChecked,
                 isVegChecked: isVegChecked,
                 isPickupChecked: isPickupChecked,
-                restaurantImgUrl : restaurantProfile.restaurant_img,
+                restaurantImgUrl: restaurantProfile.restaurant_img,
                 phone: (restaurantProfile.phone) ? restaurantProfile.phone : '',
                 street: (restaurantProfile.street) ? restaurantProfile.street : '',
                 state: (restaurantProfile.state) ? restaurantProfile.state : '',
@@ -159,15 +173,17 @@ export default class RestaurantProfile extends Component {
                 pincode: (restaurantProfile.pincode) ? restaurantProfile.pincode : ''
             })
             console.log(this.setState);
-        }
+        }).catch(error => {
+            console.log("In error");
+        })
     }
 
-    onRestaurantImageChange(event){
+    onRestaurantImageChange(event) {
         const file = event.target.files[0];
         this.setState({
-            restaurantImg : file
+            restaurantImg: file
         })
-      };
+    };
 
     render() {
         return (
@@ -277,3 +293,5 @@ export default class RestaurantProfile extends Component {
         );
     }
 }
+
+export default withApollo(RestaurantProfile);

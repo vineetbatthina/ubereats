@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import RestaurantNavBar from './RestaurantNavBar';
-import res_img_0 from '../../images/landing_page_background.jpg';
-import res_img_1 from '../../images/restaurant_profile_1.jpg';
-import res_img_2 from '../../images/restaurant_profile_2.jpg';
-import res_img_3 from '../../images/restaurant_profile_3.jpg';
 import '../../css/Restaurant.css';
-import { getRestaurantProfile } from '../../services/RestaurantService';
 import defaultRestaurant from '../../images/restaurant_1.jpg';
+import { GET_PROFILE_QUERY } from '../../queries/queries';
 
-export default class Dashboard extends Component {
+import { withApollo } from 'react-apollo';
+
+class Dashboard extends Component {
 
     constructor(props) {
         super(props);
@@ -37,16 +35,54 @@ export default class Dashboard extends Component {
         catch (error) {
             console.log(error);
         }
-        const request = {
-            emailId: emailId
-        }
-        const restaurantProfile = await getRestaurantProfile(request);
-        if (restaurantProfile) {
+
+        this.props.client.query({
+            query: GET_PROFILE_QUERY,
+            variables: {
+                owner_email: emailId
+            }
+        }).then(response => {
+            console.log("Response: ", response);
+
+            const restaurantProfile = response.data.restaurantProfile;
+
+            let isDeliveryChecked = false;
+            let isPickupChecked = false;
+            let isVegChecked = false;
+            let isNonVegChecked = false;
+            if (restaurantProfile.delivery_type) {
+                let delivery_types = restaurantProfile.delivery_type.split(",");
+
+                delivery_types.map((type) => {
+                    if (type === "DELIVERY") {
+                        isDeliveryChecked = true;
+                    }
+                    else {
+                        isPickupChecked = true;
+                    }
+                })
+
+            }
+
+            if (restaurantProfile.dishes_type) {
+
+                let dishTypes = restaurantProfile.dishes_type.split(",");
+
+                dishTypes.map((type) => {
+                    if (type === "VEGAN") {
+                        isVegChecked = true;
+                    }
+                    else if (type === "NONVEG") {
+                        isNonVegChecked = true;
+                    }
+                })
+            }
+
             this.setState({
                 restaurantName: restaurantProfile.store_name,
                 location: restaurantProfile.store_location,
                 description: (restaurantProfile.description) ? restaurantProfile.description : '',
-                restaurantImgUrl : (restaurantProfile.restaurant_img) ? restaurantProfile.restaurant_img : '',
+                restaurantImgUrl: restaurantProfile.restaurant_img,
                 timings: (restaurantProfile.timings) ? restaurantProfile.timings : '',
                 emailId: localStorage.getItem('emailId'),
                 phone: (restaurantProfile.phone) ? restaurantProfile.phone : '',
@@ -55,12 +91,13 @@ export default class Dashboard extends Component {
                 country: (restaurantProfile.country) ? restaurantProfile.country : '',
                 pincode: (restaurantProfile.pincode) ? restaurantProfile.pincode : ''
             })
-        }
+        }).catch(error => {
+            console.log("In error");
+        })
     }
 
     render() {
-        const res_img_array = [res_img_0,res_img_1,res_img_2,res_img_3];
-        const res_img = res_img_array[Math.floor(Math.random() * res_img_array.length)];
+
         return (
             <div>
                 <RestaurantNavBar />
@@ -77,3 +114,5 @@ export default class Dashboard extends Component {
         );
     }
 }
+
+export default withApollo(Dashboard);

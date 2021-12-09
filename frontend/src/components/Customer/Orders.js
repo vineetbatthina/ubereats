@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import { getOrdersByCustEmail } from '../../services/CustomerService';
 import CustomerNavBar from '../Customer/CustomerNavBar';
 import Pagination from '../Common/Pagination';
+import { withApollo } from 'react-apollo';
 
-export default class Orders extends Component {
+import { GET_CUSTOMER_ORDERS } from '../../queries/queries';
+
+class Orders extends Component {
 
     constructor(props) {
         super(props);
@@ -12,7 +15,7 @@ export default class Orders extends Component {
             orders: [],
             currentOrders: [],
             previousOrders: [],
-            cancelledOrders:[],
+            cancelledOrders: [],
             showCurrOrders: false,
             showPrevOrders: false,
             showCancelledOrders: false
@@ -31,55 +34,63 @@ export default class Orders extends Component {
         const request = {
             emailId: emailId
         }
-        const orders = await getOrdersByCustEmail(request);
-        const currentOrders = [];
-        const previousOrders = [];
-        const cancelledOrders = [];
 
-        if (orders) {
-            orders.map((order) => {
-                if (order.status === 'DELIVERED' || order.status === 'PICKED_UP' || order.status === 'CANCELLED') {
-                    previousOrders.push(order);
-                    if (order.status === 'CANCELLED') {
-                        cancelledOrders.push(order);
+        this.props.client.query({
+            query: GET_CUSTOMER_ORDERS,
+            variables: {
+                email_id: emailId
+            }
+        }).then(response => {
+            console.log(response);
+            if (response.data.getOrdersForCustomer) {
+
+                const orders = [];
+                const currentOrders = [];
+                const previousOrders = [];
+                const cancelledOrders = [];
+                response.data.getOrdersForCustomer.map((order) => {
+                    if (order.status === 'DELIVERED' || order.status === 'PICKED_UP' || order.status === 'CANCELLED') {
+                        previousOrders.push(order);
+                        if (order.status === 'CANCELLED') {
+                            cancelledOrders.push(order);
+                        }
                     }
-                }
-                else {
-                    currentOrders.push(order);
-                }
-            })
-            this.setState({
-                orders: orders,
-                currentOrders: currentOrders,
-                previousOrders: previousOrders,
-                cancelledOrders: cancelledOrders,
-                showCurrOrders: (currentOrders.length > 0 ? true : false),
-                showPrevOrders: (previousOrders.length > 0 ? true : false)
-            })
-        }
-        else {
+                    else {
+                        currentOrders.push(order);
+                    }
+                })
+                this.setState({
+                    orders: orders,
+                    currentOrders: currentOrders,
+                    previousOrders: previousOrders,
+                    cancelledOrders: cancelledOrders,
+                    showCurrOrders: (currentOrders.length > 0 ? true : false),
+                    showPrevOrders: (previousOrders.length > 0 ? true : false)
+                })
+            }
+        }).catch(err => {
             console.log("Error Fetching Orders");
             this.setState({
                 orders: [],
                 currentOrders: [],
                 previousOrders: []
             })
-        }
+        })
     }
 
-    handleShowCancelledOrders  = () =>{
+    handleShowCancelledOrders = () => {
         this.setState({
-            showCancelledOrders: true ,
-            showPrevOrders : false,
-            showCurrOrders : false
+            showCancelledOrders: true,
+            showPrevOrders: false,
+            showCurrOrders: false
         });
     }
 
-    handleShowAllOrders  = () =>{
+    handleShowAllOrders = () => {
         this.setState({
-            showCancelledOrders: false ,
-            showPrevOrders : true,
-            showCurrOrders : true
+            showCancelledOrders: false,
+            showPrevOrders: true,
+            showCurrOrders: true
         });
     }
 
@@ -90,10 +101,10 @@ export default class Orders extends Component {
 
                 <div className="row" style={{ paddingLeft: '3%' }}>
                     <div className="col-2">
-                        <button onClick={this.handleShowCancelledOrders }>Cancelled orders</button>
+                        <button onClick={this.handleShowCancelledOrders}>Cancelled orders</button>
                     </div>
                     <div className="col-1" style={{ marginRight: '0%' }}>
-                        <button onClick={this.handleShowAllOrders } >All orders</button>
+                        <button onClick={this.handleShowAllOrders} >All orders</button>
                     </div>
                     <br />
                     <br />
@@ -127,3 +138,5 @@ export default class Orders extends Component {
         )
     }
 }
+
+export default withApollo(Orders);

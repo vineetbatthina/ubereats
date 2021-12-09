@@ -4,13 +4,17 @@ import CustomerRestaurantsDisplay from './CustomerRestaurantsDisplay';
 import { getCustomerProfileByEmailId } from '../../services/CustomerService';
 import CustomerFilters from './CustomerFilters';
 
-export default class CustomerDashboard extends Component {
+import { GET_CUSTOMER_PROFILE } from '../../queries/queries';
+
+import { withApollo } from 'react-apollo';
+
+class CustomerDashboard extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            currFilters : {}
+            currFilters: {}
         }
 
         this.filtersChanged = this.filtersChanged.bind(this);
@@ -24,28 +28,18 @@ export default class CustomerDashboard extends Component {
         catch (error) {
             console.log(error);
         }
-        const request = {
-            emailId: emailId
-        }
-        const customerProfile = await getCustomerProfileByEmailId(request);
-        if (customerProfile) {
-            if (customerProfile.length === 0) {
-                this.setState({
-                    emailId: localStorage.getItem('emailId'),
-                    phone: '',
-                    name: '',
-                    nickName: '',
-                    dob: '',
-                    street: '',
-                    city: '',
-                    state: '',
-                    country: '',
-                    pincode: '',
-                    profileImg: '',
-                    noProfileData: true
-                })
+
+        console.log("EmailId is :" + emailId);
+        this.props.client.query({
+            query: GET_CUSTOMER_PROFILE,
+            variables: {
+                email_id: emailId
             }
-            else {
+        }).then(result => {
+            console.log("Result from backend: ", result);
+            let customerProfile = result.data.getCustomerProfile;
+            if (customerProfile) {
+
                 if (JSON.parse(customerProfile.address).city) {
                     localStorage.setItem('cust_location', JSON.parse(customerProfile.address).city);
                 }
@@ -63,13 +57,47 @@ export default class CustomerDashboard extends Component {
                     profileImg: customerProfile.profile_img,
                     noProfileData: false
                 })
+
             }
-        }
+            else {
+                this.setState({
+                    emailId: localStorage.getItem('emailId'),
+                    phone: '',
+                    name: '',
+                    nickName: '',
+                    dob: '',
+                    street: '',
+                    city: '',
+                    state: '',
+                    country: '',
+                    pincode: '',
+                    profileImg: '',
+                    noProfileData: true
+                })
+            }
+        })
+            .catch(error => {
+                console.log(error);
+                this.setState({
+                    emailId: localStorage.getItem('emailId'),
+                    phone: '',
+                    name: '',
+                    nickName: '',
+                    dob: '',
+                    street: '',
+                    city: '',
+                    state: '',
+                    country: '',
+                    pincode: '',
+                    profileImg: '',
+                    noProfileData: true
+                })
+            })
     }
 
-    filtersChanged(currFilters){
+    filtersChanged(currFilters) {
         this.setState({
-            currFilters : currFilters
+            currFilters: currFilters
         })
     }
 
@@ -79,12 +107,12 @@ export default class CustomerDashboard extends Component {
                 < CustomerNavBar />
                 <div className="row">
                     <div className="col-3">
-                        <CustomerFilters filtersChanged = {this.filtersChanged}/>
+                        <CustomerFilters filtersChanged={this.filtersChanged} />
                     </div>
                     <div className="col-9">
                         <div className="row">
                             <div className="col" style={{ marginLeft: '2%' }}>
-                                <CustomerRestaurantsDisplay currFilters={this.state.currFilters}/>
+                                <CustomerRestaurantsDisplay currFilters={this.state.currFilters} />
                             </div>
                         </div>
                     </div>
@@ -93,3 +121,5 @@ export default class CustomerDashboard extends Component {
         );
     }
 }
+
+export default withApollo(CustomerDashboard);

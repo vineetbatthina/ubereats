@@ -80,6 +80,7 @@ class CustomerNavBar extends Component {
 
     onCartClick = () => {
         const restaurantMap = new Map(JSON.parse(localStorage.restaurantMap));
+        console.log(restaurantMap);
         let cartDishes = JSON.parse(localStorage.getItem("cart_dishes"))
         const restaurantId = (cartDishes ? cartDishes.restaurantId : '1');
         const restaurantName = (restaurantMap ? restaurantMap.get(restaurantId) : "Restaurant Name");

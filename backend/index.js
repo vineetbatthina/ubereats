@@ -1,20 +1,24 @@
 const express = require('express');
+const schema = require('./GraphQLSchema/schema');
+const {graphqlHTTP} = require('express-graphql');
+
 const app = express(),
   bodyParser = require("body-parser");
 Cors = require("cors"),
   port = 3080;
 
+require('./resources.js');
+
 app.use(bodyParser.json());
 app.use(Cors({exposedHeaders: 'token'}));
 
-const customer_router = require('./routes/customer');
-app.use(customer_router);
+app.use("/graphql",graphqlHTTP({
+  schema,
+  graphiql: true
+}));
 
 const users_router = require('./routes/users');
 app.use(users_router);
-
-const restaurant_router = require('./routes/restaurants');
-app.use(restaurant_router);
 
 app.get('/', (req, res) => {
   res.send('App Works !!!!');

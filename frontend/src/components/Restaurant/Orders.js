@@ -7,7 +7,11 @@ import RestaurantNavBar from './RestaurantNavBar';
 import { updateOrder } from "../../services/RestaurantService";
 import '../../css/Generic.css';
 
-export default class Orders extends Component {
+import { withApollo } from 'react-apollo';
+import { GET_RESTAURANT_ORDERS } from '../../queries/queries';
+import { UPDATE_ORDER_STATUS } from '../../mutations/mutations';
+
+class Orders extends Component {
 
     constructor(props) {
         super(props);
@@ -18,7 +22,7 @@ export default class Orders extends Component {
             editStatusModalVisible: false,
             orderModalVisible: false,
             currentOrder: {},
-            currentOrderDishes:'[]',
+            currentOrderDishes: '[]',
             changedStatus: '',
             currentOrdersStatus: 'RECEIVED'
         }
@@ -49,48 +53,57 @@ export default class Orders extends Component {
         if (currOrder.status !== this.state.changedStatus && currOrder.status !== '') {
             currOrder.status = this.state.changedStatus;
 
-            const updateSuccessful = await updateOrder(currOrder);
-            if (updateSuccessful) {
-                let emailId = 'default@default.com';
-                try {
-                    emailId = localStorage.getItem('emailId');
+            this.props.client.mutate({
+                mutation: UPDATE_ORDER_STATUS,
+                variables: {
+                    _id: currOrder._id,
+                    status: currOrder.status
                 }
-                catch (error) {
-                    console.log(error);
-                }
-                const request = {
-                    emailId: emailId
-                }
-                const orders = await getOrdersByResId(request);
-                const filteredOrders = [];
-                if (orders) {
-
-                    orders.forEach((order) => {
-                        if (order.status === currOrder.status) {
-                            filteredOrders.push(order);
+            }).then(response => {
+                console.log("After Update, Response from backend is: ",response);
+                if (response.data.updateOrderStatus) {
+                    let emailId = 'default@default.com';
+                    try {
+                        emailId = localStorage.getItem('emailId');
+                    }
+                    catch (error) {
+                        console.log(error);
+                    }
+                    this.props.client.query({
+                        query: GET_RESTAURANT_ORDERS,
+                        variables: {
+                            email_id: emailId
                         }
+                    }).then(response => {
+                        console.log(response);
+                        if (response.data.getOrdersByRestaurantId) {
+                            const filteredOrders = [];
+                            response.data.getOrdersByRestaurantId.forEach((order) => {
+                                if (order.status === 'RECEIVED') {
+                                    filteredOrders.push(order);
+                                }
+                            })
+            
+                            this.setState({
+                                orders: response.data.getOrdersByRestaurantId,
+                                filteredOrders: filteredOrders
+                            })
+                        }
+                    }).catch(err => {
+                        console.log("Error Fetching Orders");
+                        this.setState({
+                            orders: [],
+                            filteredOrders: []
+                        })
                     })
-
-                    this.setState({
-                        orders: orders,
-                        filteredOrders: filteredOrders,
-                        editStatusModalVisible: false,
-                        changedStatus: currOrder.status
-                    })
-
                 }
-                else {
-                    console.log("Error Fetching Orders");
-                    this.setState({
-                        orders: [],
-                        filteredOrders: [],
-                        editStatusModalVisible: true
-                    })
-                }
-            }
-            else {
-
-            }
+            }).catch(err => {
+                console.log("Error Fetching Orders");
+                this.setState({
+                    orders: [],
+                    filteredOrders: []
+                })
+            })
         }
     }
 
@@ -123,32 +136,34 @@ export default class Orders extends Component {
         catch (error) {
             console.log(error);
         }
-        const request = {
-            emailId: emailId
-        }
-        const orders = await getOrdersByResId(request);
-        const filteredOrders = [];
-        if (orders) {
 
-            orders.forEach((order) => {
-                if (order.status === 'RECEIVED') {
-                    filteredOrders.push(order);
-                }
-            })
+        this.props.client.query({
+            query: GET_RESTAURANT_ORDERS,
+            variables: {
+                email_id: emailId
+            }
+        }).then(response => {
+            console.log(response);
+            if (response.data.getOrdersByRestaurantId) {
+                const filteredOrders = [];
+                response.data.getOrdersByRestaurantId.forEach((order) => {
+                    if (order.status === 'RECEIVED') {
+                        filteredOrders.push(order);
+                    }
+                })
 
-            this.setState({
-                orders: orders,
-                filteredOrders: filteredOrders
-            })
-
-        }
-        else {
+                this.setState({
+                    orders: response.data.getOrdersByRestaurantId,
+                    filteredOrders: filteredOrders
+                })
+            }
+        }).catch(err => {
             console.log("Error Fetching Orders");
             this.setState({
                 orders: [],
                 filteredOrders: []
             })
-        }
+        })
     }
 
     render() {
@@ -199,7 +214,7 @@ export default class Orders extends Component {
                                                 <td>${order.order_price}</td>
                                                 <td>
                                                     <div className="row" >
-                                                        <div className="col-2" hidden={(order.status==="DELIVERED") || (order.status==="CANCELLED")  ? true : false} onClick={() => {
+                                                        <div className="col-2" hidden={(order.status === "DELIVERED") || (order.status === "CANCELLED") ? true : false} onClick={() => {
                                                             this.setState({
                                                                 currentOrder: order,
                                                                 editStatusModalVisible: true,
@@ -292,61 +307,61 @@ export default class Orders extends Component {
                         </Modal.Header>
                         <Modal.Body>
                             <center>
-                            <div className="container">
-                                            <div className="row">
-                                                <div className="col">
-                                                    Payment Mode :
-                                                </div>
-                                                <div className="col">
-                                                    {this.state.currentOrder.payment_mode}
-                                                </div>
-                                            </div>
-                                            <div className="row">
-                                                <div className="col">
-                                                    Order Placed on :
-                                                </div>
-                                                <div className="col">
-                                                    {this.state.currentOrder.order_timestamp}
-                                                </div>
-                                            </div>
-                                            <div className="row">
-                                                <div className="col">
-                                                    Total Price :
-                                                </div>
-                                                <div className="col">
-                                                    {this.state.currentOrder.order_price}
-                                                </div>
-                                            </div>
-                                            <div className="row">
-                                                <div className="col">
-                                                    Order Status :
-                                                </div>
-                                                <div className="col">
-                                                    <b>{this.state.currentOrder.status}</b>
-                                                </div>
-                                            </div>
-                                            <br />
-                                            <div className="row">
-                                                <h5>Dishes Ordered</h5>
-                                            </div>
-                                            {
-                                                JSON.parse(this.state.currentOrderDishes).map((dish) => {
-                                                    return (
-                                                        <div key={dish._id}>     
-                                                                {dish.dishName}
-                                                                <div className="col">
-                                                                   Quantity: {dish.dish_quantity}
-                                                                </div>
-                                                                <div className="col">
-                                                                   Price: ${dish.dish_price}
-                                                                </div>
-                                                                <hr />
-                                                        </div>
-                                                    )
-                                                })
-                                            }
-                                            <hr />
+                                <div className="container">
+                                    <div className="row">
+                                        <div className="col">
+                                            Payment Mode :
                                         </div>
+                                        <div className="col">
+                                            {this.state.currentOrder.payment_mode}
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col">
+                                            Order Placed on :
+                                        </div>
+                                        <div className="col">
+                                            {this.state.currentOrder.order_timestamp}
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col">
+                                            Total Price :
+                                        </div>
+                                        <div className="col">
+                                            {this.state.currentOrder.order_price}
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col">
+                                            Order Status :
+                                        </div>
+                                        <div className="col">
+                                            <b>{this.state.currentOrder.status}</b>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div className="row">
+                                        <h5>Dishes Ordered</h5>
+                                    </div>
+                                    {
+                                        JSON.parse(this.state.currentOrderDishes).map((dish) => {
+                                            return (
+                                                <div key={dish._id}>
+                                                    {dish.dishName}
+                                                    <div className="col">
+                                                        Quantity: {dish.dish_quantity}
+                                                    </div>
+                                                    <div className="col">
+                                                        Price: ${dish.dish_price}
+                                                    </div>
+                                                    <hr />
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                    <hr />
+                                </div>
                             </center>
                         </Modal.Body>
                     </Modal>
@@ -357,3 +372,5 @@ export default class Orders extends Component {
         )
     }
 }
+
+export default withApollo(Orders);

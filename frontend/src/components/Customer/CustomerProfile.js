@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import '../../css/Generic.css';
 import CustomerNavBar from '../Customer/CustomerNavBar';
-import { getCustomerProfileByEmailId } from '../../services/CustomerService';
 import { saveCustomerProfile, updateCustomerProfile, uploadProfilePicturetoS3 } from '../../services/CustomerService';
 
-export default class CustomerProfile extends Component {
+import { withApollo } from 'react-apollo';
+import { GET_CUSTOMER_PROFILE } from '../../queries/queries';
+
+
+class CustomerProfile extends Component {
 
     constructor(props) {
         super(props);
@@ -23,13 +26,14 @@ export default class CustomerProfile extends Component {
             pincode: '',
             profileImg: '',
             noProfileData: false,
-            profilePicture : '',
-            profilePictureUrl:''
+            profilePicture: '',
+            profilePictureUrl: ''
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onProfilePictureChange = this.onProfilePictureChange.bind(this);
     }
+
 
     async componentDidMount() {
         let emailId = 'default@default.com';
@@ -39,11 +43,16 @@ export default class CustomerProfile extends Component {
         catch (error) {
             console.log(error);
         }
-        const request = {
-            emailId: emailId
-        }
-        const customerProfile = await getCustomerProfileByEmailId(request);
-        if (customerProfile) {
+        this.props.client.query({
+            query: GET_CUSTOMER_PROFILE,
+            variables: {
+                email_id: emailId
+            }
+        }).then(result => {
+            console.log("Result from backend: ", result);
+            let customerProfile = result.data.getCustomerProfile;
+            if (customerProfile) {
+
                 let profilePictureUrl = '';
                 if (JSON.parse(customerProfile.address).city) {
                     localStorage.setItem('cust_location', JSON.parse(customerProfile.address).city);
@@ -51,7 +60,7 @@ export default class CustomerProfile extends Component {
                 else {
                     localStorage.setItem('cust_location', '');
                 }
-                if(customerProfile.profile_img){
+                if (customerProfile.profile_img) {
                     profilePictureUrl = customerProfile.profile_img
                 }
                 this.setState({
@@ -65,27 +74,45 @@ export default class CustomerProfile extends Component {
                     state: JSON.parse(customerProfile.address).state,
                     country: JSON.parse(customerProfile.address).country,
                     pincode: JSON.parse(customerProfile.address).pincode,
-                    profilePictureUrl : profilePictureUrl,
+                    profilePictureUrl: profilePictureUrl,
                     noProfileData: false
                 })
-            
-        }
-        else{
-            this.setState({
-                emailId: localStorage.getItem('emailId'),
-                phone: '',
-                name: '',
-                nickName: '',
-                dob: '',
-                street: '',
-                city: '',
-                state: '',
-                country: '',
-                pincode: '',
-                profileImg: '',
-                noProfileData: true
+
+            }
+            else {
+                this.setState({
+                    emailId: localStorage.getItem('emailId'),
+                    phone: '',
+                    name: '',
+                    nickName: '',
+                    dob: '',
+                    street: '',
+                    city: '',
+                    state: '',
+                    country: '',
+                    pincode: '',
+                    profileImg: '',
+                    noProfileData: true
+                })
+            }
+        })
+            .catch(error => {
+                console.log(error);
+                this.setState({
+                    emailId: localStorage.getItem('emailId'),
+                    phone: '',
+                    name: '',
+                    nickName: '',
+                    dob: '',
+                    street: '',
+                    city: '',
+                    state: '',
+                    country: '',
+                    pincode: '',
+                    profileImg: '',
+                    noProfileData: true
+                })
             })
-        }
     }
 
     async handleSubmit(event) {
@@ -164,12 +191,12 @@ export default class CustomerProfile extends Component {
 
     }
 
-    onProfilePictureChange(event){
+    onProfilePictureChange(event) {
         const file = event.target.files[0];
         this.setState({
-            profilePicture : file
+            profilePicture: file
         })
-      };
+    };
 
     render() {
         return (
@@ -179,7 +206,7 @@ export default class CustomerProfile extends Component {
                 <div className="container">
                     <form>
                         <h2>Profile</h2>
-                        <img src={this.state.profilePictureUrl} className="img-thumbnail" style={{width:'10%'}} hidden={this.state.profilePictureUrl===''}></img>
+                        <img src={this.state.profilePictureUrl} className="img-thumbnail" style={{ width: '10%' }} hidden={this.state.profilePictureUrl === ''}></img>
                         <div className="form-group">
                             <label >Name</label>
                             <input type="text" className="form-control" value={this.state.name} onChange={(e) => this.setState({ name: e.target.value })} />
@@ -192,7 +219,7 @@ export default class CustomerProfile extends Component {
                             <label >D.O.B</label>
                             <input type="text" className="form-control" value={this.state.dob} onChange={(e) => this.setState({ dob: e.target.value })} />
                         </div>
-                        <br/>
+                        <br />
                         <div className="form-group">
                             <div className="col-3">
                                 Profile Image<input accept="image/*" type="file" className="form-control-file" placeholder="Upload your Profile Picture" onChange={this.onProfilePictureChange}></input>
@@ -219,10 +246,18 @@ export default class CustomerProfile extends Component {
                             <input type="text" className="form-control" value={this.state.country} onChange={(e) => this.setState({ country: e.target.value })} />
                         </div>
                         <div className="form-group">
+                            <select label="Country">
+                                <option>India</option>
+                                <option>USA</option>
+                                <option>China</option>
+                                <option>Mexico</option>
+                                <option>Japan</option>
+                            </select>
+                        </div>
+                        <div className="form-group">
                             <label >Pincode</label>
                             <input type="number" className="form-control" value={this.state.pincode} onChange={(e) => this.setState({ pincode: e.target.value })} />
                         </div>
-
                         <br />
                         <hr />
                         <h4>Contact Information</h4>
@@ -254,3 +289,5 @@ export default class CustomerProfile extends Component {
         );
     }
 }
+
+export default withApollo(CustomerProfile);

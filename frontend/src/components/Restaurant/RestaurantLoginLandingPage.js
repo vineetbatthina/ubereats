@@ -1,60 +1,107 @@
 import React, { Component } from 'react';
 import '../../css/Restaurant.css';
-import { addRestaurant } from '../../_actions/index';
-import { addCustomerUser } from '../../_actions/index';
-import {connect} from 'react-redux';
-import {Redirect} from 'react-router';
+import { Redirect } from 'react-router';
+
+import { withApollo } from 'react-apollo';
+import { CREATE_RESTAURANT_QUERY, CREATE_USER_QUERY } from '../../mutations/mutations';
 
 class RestaurantLoginLandingPage extends Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
-        this.state ={
-            storeName : '',
+        this.state = {
+            storeName: '',
             storeLocation: '',
-            ownerName : '',
-            emailId : '',
-            pwd : '',
-            rePwd : ''
+            ownerName: '',
+            emailId: '',
+            pwd: '',
+            rePwd: '',
+            addedRestaurant: ''
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleSubmit(event){
+    handleSubmit(event) {
         event.preventDefault();
-        if(this.state.pwd !== this.state.rePwd){
+        if (this.state.pwd !== this.state.rePwd) {
             alert("Passwords Don't Match");
             return 0;
         }
-        const restaurantUser = {
-            userEmail: this.state.emailId,
-            userName : this.state.ownerName,
-            password: this.state.pwd,
-            restaurantOwner: 'Y'
-        }
-        const restuarant = {
-            storeName: this.state.storeName,
-            storeLocation : this.state.storeLocation,
-            ownerEmail: this.state.emailId,
-        }
 
-        this.props.addCustomerUser(restaurantUser);
-        this.props.addRestaurant(restuarant);
+        var restaurantResponse = false;
+        var userResponse = false;
+        console.log("Here 1");
+        this.props.client.mutate({
+            mutation: CREATE_RESTAURANT_QUERY,
+            variables: {
+                store_name: this.state.storeName,
+                store_location: this.state.storeLocation,
+                owner_email: this.state.emailId,
+            }
+        })
+            .then(response => {
+                console.log("inside success")
+                console.log("response in update profile owner ", response.data);
+                restaurantResponse = (response.data.createRestaurantProfile.success === true) ? true : false;
+                console.log(restaurantResponse);
+            })
+            .catch(error => {
+                console.log("In error");
+                console.log(error);
+                restaurantResponse = false;
+            })
+
+        this.props.client.mutate({
+            mutation: CREATE_USER_QUERY,
+            variables: {
+                user_name: this.state.ownerName,
+                user_emailId: this.state.emailId,
+                user_pwd: this.state.pwd,
+                restaurant_owner: 'Y'
+            }
+        })
+            .then(response => {
+                console.log("inside success")
+                console.log("response in update profile owner ", response.data);
+                userResponse = (response.data.createUser.success === true) ? true : false;
+                console.log(userResponse);
+                console.log(restaurantResponse);
+                console.log(userResponse);
+                if (restaurantResponse && userResponse) {
+                    console.log("here 11");
+                    this.setState({
+                        addedRestaurant: "SUCCESS"
+                    })
+                }
+                else {
+                    console.log("here 22");
+                    this.setState({
+                        addedRestaurant: "FAILURE"
+                    })
+                }
+            })
+            .catch(error => {
+                console.log("In error");
+                console.log(error);
+                userResponse = false;
+            })
+
     }
 
     render() {
         let redirectComponent = null;
-        if (this.props.userAdditionStatus === "SUCCESS" && this.props.restaurantAdditionStatus === "SUCCESS" ) {
+        console.log(this.state.addedRestaurant);
+        if (this.state.addedRestaurant === "SUCCESS") {
             alert("Signup is successful");
             redirectComponent = <Redirect to="/" />
         }
-        else if(this.props.userAdditionStatus==="DUP" || this.props.restaurantAdditionStatus==="DUP"){
+        else if (this.state.addedRestaurant === "FAILURE") {
             alert('Email Id / User Id exists. Please Retry');
-        }
-        else if(this.props.userAdditionStatus==="ERR" || this.props.restaurantAdditionStatus==="ERR"){
-            alert('Please contact administrator');
+            this.setState({
+                addedRestaurant : ''
+            })
         }
         return (
             <div className="restaurant_landingpage">
@@ -64,14 +111,14 @@ class RestaurantLoginLandingPage extends Component {
                         <span id="uber">Uber</span> <span id="eats">Eats</span> <span id="for_res">for Restaurants</span>
                         <div className="sign_in_up">
                             <a href="/userLogin">
-                            <button id="signin">
-                                Sign in
-                            </button>
+                                <button id="signin">
+                                    Sign in
+                                </button>
                             </a>
                             <a href="/restaurant">
-                            <button id="signup">
-                                Sign up
-                            </button>
+                                <button id="signup">
+                                    Sign up
+                                </button>
                             </a>
                         </div>
                     </div>
@@ -93,18 +140,4 @@ class RestaurantLoginLandingPage extends Component {
     }
 }
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        addCustomerUser : restaurantUser => dispatch(addCustomerUser(restaurantUser)),
-        addRestaurant : restuarant => dispatch(addRestaurant(restuarant))   
-     }
-}
-
-const mapStateToProps = state => {
-    return {
-        userAdditionStatus : state.userReducer.signupStatus,
-        restaurantAdditionStatus : state.restaurantReducer.signupStatus
-    };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(RestaurantLoginLandingPage);
+export default withApollo(RestaurantLoginLandingPage);

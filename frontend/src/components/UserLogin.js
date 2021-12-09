@@ -1,8 +1,17 @@
 import React, { Component } from "react";
 import '../css/User.css';
-import { connect } from "react-redux";
-import { loginUser } from '../_actions/index';
 import { Redirect } from 'react-router';
+
+import { withApollo } from 'react-apollo';
+import { gql } from 'apollo-boost';
+
+const LOGIN_QUERY = gql`
+query LoginQuery($user_emailId: String, $user_pwd: String){
+        login(user_emailId: $user_emailId, user_pwd: $user_pwd){
+            user_name,
+            restaurant_owner
+    }
+}`
 
 class UserLogin extends Component {
 
@@ -11,7 +20,9 @@ class UserLogin extends Component {
 
         this.state = {
             emailId: '',
-            pwd: ''
+            pwd: '',
+            loginSuccess: false,
+            isRestaurantOwner : ''
         }
 
         this.setPageProp = this.setPageProp.bind(this);
@@ -24,21 +35,31 @@ class UserLogin extends Component {
 
     handleLogin(event) {
         event.preventDefault();
-        const credentials = {
-            emailId: this.state.emailId,
-            pwd: this.state.pwd
-        }
-        this.props.loginUser(credentials);
+
+        this.props.client.query({
+            query: LOGIN_QUERY,
+            variables: {
+                user_emailId : this.state.emailId,
+                user_pwd: this.state.pwd
+            }
+        }).then(response => {
+            console.log("Response: ", response);
+            this.setState({
+                loginSuccess : true,
+                isRestaurantOwner : response.data.login.restaurant_owner
+            })
+        }).catch(error => {
+            console.log("In error");
+        })
     }
 
     render() {
         let redirectComponent = null;
-        if (this.props.loginStatus === true && this.props.token.length>0) {
+        if (this.state.loginSuccess ) {
             alert("Login is successful");
-            localStorage.setItem('isLoggedIn', this.props.loginStatus);
-            localStorage.setItem('isRestaurantOwner', this.props.isRestaurantOwner);
+            localStorage.setItem('isLoggedIn', this.state.loginSuccess);
+            localStorage.setItem('isRestaurantOwner', this.state.isRestaurantOwner);
             localStorage.setItem('emailId', this.state.emailId);
-            localStorage.setItem("token", this.props.token);
             const cart_dishes = {
                 restaurantId: '',
                 dishes: []
@@ -46,10 +67,10 @@ class UserLogin extends Component {
 
             localStorage.setItem('cart_dishes', JSON.stringify(cart_dishes));
 
-            if (this.props.isRestaurantOwner === 'N') {
+            if (this.state.isRestaurantOwner === 'N') {
                 redirectComponent = <Redirect to="/custdashboard" />
             }
-            else if (this.props.isRestaurantOwner === 'Y') {
+            else if (this.state.isRestaurantOwner === 'Y') {
                 redirectComponent = <Redirect to="/dashboard" />
             }
         }
@@ -103,18 +124,4 @@ class UserLogin extends Component {
     }
 }
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        loginUser: customerUser => dispatch(loginUser(customerUser))
-    }
-}
-
-const mapStateToProps = state => {
-    return {
-        loginStatus: state.userReducer.loginStatus,
-        isRestaurantOwner: state.userReducer.isRestaurantOwner,
-        token : state.userReducer.token
-    };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(UserLogin);
+export default withApollo(UserLogin);

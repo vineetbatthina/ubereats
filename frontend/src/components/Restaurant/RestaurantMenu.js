@@ -8,8 +8,10 @@ import RestaurantMenuAdd from './RestaurantMenuAdd';
 import { Modal } from 'react-bootstrap';
 import { updateDish } from '../../services/RestaurantService';
 import { uploadDishtoS3 } from '../../services/UserService';
+import { withApollo } from 'react-apollo';
+import { GET_RESTAURANT_DISHES } from '../../queries/queries';
 
-export default class RestaurantMenu extends Component {
+class RestaurantMenu extends Component {
 
     constructor(props) {
         super(props);
@@ -25,8 +27,8 @@ export default class RestaurantMenu extends Component {
             currDishIngredients: '',
             currDishCategory: '',
             dishModalVisible: false,
-            dishImg : '',
-            dishImgUrl:''
+            dishImg: '',
+            dishImgUrl: ''
         }
 
         this.fetchDishes = this.fetchDishes.bind(this);
@@ -41,17 +43,29 @@ export default class RestaurantMenu extends Component {
         catch (error) {
             console.log(error);
         }
-        const request = {
-            emailId: emailId
-        }
-        const dishesFromBackend = await getDishes(request);
-        if (dishesFromBackend) {
-            this.setState({
-                dishes: dishesFromBackend,
-                hideAddItem: true
-            });
-        }
-        console.log(this.state.dishes);
+
+        this.props.client.query({
+            query: GET_RESTAURANT_DISHES,
+            variables: {
+                owner_email: emailId
+            }
+        })
+            .then(response => {
+                console.log("inside success")
+                console.log("response in all items ", response.data);
+                if (response.data.getRestaurantDishes.length > 0) {
+                    console.log("response", response.data)
+                    this.setState({
+                        dishes: response.data.getRestaurantDishes,
+                        hideAddItem: true
+                    });
+                    console.log("Dishes", this.state.getRestaurantDishes)
+                }
+            })
+            .catch(error => {
+                console.log("In error");
+                console.log(error);
+            })
     }
 
     async updateItem(event) {
@@ -78,7 +92,7 @@ export default class RestaurantMenu extends Component {
             dishPrice: this.state.currDishPrice,
             dishIngredients: this.state.currDishIngredients,
             dishCategory: this.state.currDishCategory,
-            dishImgUrl : dishImgUrl
+            dishImgUrl: dishImgUrl
         }
 
         const response = await updateDish(dish);
@@ -114,23 +128,35 @@ export default class RestaurantMenu extends Component {
         catch (error) {
             console.log(error);
         }
-        const request = {
-            emailId: emailId
-        }
-        const dishesFromBackend = await getDishes(request);
-        if (dishesFromBackend) {
-            this.setState({
-                dishes: dishesFromBackend
-            });
-        }
+        this.props.client.query({
+            query: GET_RESTAURANT_DISHES,
+            variables: {
+                owner_email: emailId
+            }
+        })
+            .then(response => {
+                console.log("inside success")
+                console.log("response in all items ", response.data);
+                if (response.data.getRestaurantDishes.length > 0) {
+                    console.log("response", response.data)
+                    this.setState({
+                        dishes: response.data.getRestaurantDishes
+                    });
+                    console.log("Dishes", this.state.getRestaurantDishes)
+                }
+            })
+            .catch(error => {
+                console.log("In error");
+                console.log(error);
+            })
     }
 
     onDishImageChange = (event) => {
         const file = event.target.files[0];
         this.setState({
-            dishImg : file
+            dishImg: file
         })
-      };
+    };
 
     render() {
         let buttonText = "Add Item";
@@ -169,10 +195,10 @@ export default class RestaurantMenu extends Component {
                                             currDishIngredients: dish.dish_ingredients,
                                             currDishCategory: dish.dish_category,
                                             dishModalVisible: true,
-                                            dishImgUrl : (dish.dish_img) ? dish.dish_img : ''
+                                            dishImgUrl: (dish.dish_img) ? dish.dish_img : ''
                                         })
                                     }}>
-                                        <Dish dishName={dish.dish_name} dishDescription={dish.dish_description} dishPrice={dish.dish_price} dishIngredients={dish.dish_ingredients} dishCategory={dish.dish_category} dishImg={dish.dish_img}/>
+                                        <Dish dishName={dish.dish_name} dishDescription={dish.dish_description} dishPrice={dish.dish_price} dishIngredients={dish.dish_ingredients} dishCategory={dish.dish_category} dishImg={dish.dish_img} />
                                     </div>
                                 )
                             })
@@ -235,3 +261,5 @@ export default class RestaurantMenu extends Component {
         );
     }
 }
+
+export default withApollo(RestaurantMenu);

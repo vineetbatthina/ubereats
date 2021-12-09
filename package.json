@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "react-bootstrap-country-select": "^1.0.0",
+    "react-select": "^5.2.1"
+  }
+}

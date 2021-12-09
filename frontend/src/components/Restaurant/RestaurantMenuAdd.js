@@ -1,20 +1,22 @@
 import React, { Component } from "react";
-import { saveDish } from "../../services/RestaurantService";
-import {uploadDishtoS3} from "../../services/UserService";
+import { uploadDishtoS3 } from "../../services/UserService";
+import { withApollo } from 'react-apollo';
+import { CREATE_DISH_QUERY } from '../../mutations/mutations';
+import { GET_RESTAURANT_DISHES } from '../../queries/queries';
 
-export default class RestaurantMenuAdd extends Component {
+class RestaurantMenuAdd extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            dishName : '',
+            dishName: '',
             dishDescription: '',
             dishPrice: '',
             dishIngredients: '',
             dishCategory: '',
             dishMessege: '',
-            dishImg : '',
+            dishImg: '',
         }
 
         this.addDish = this.addDish.bind(this);
@@ -33,52 +35,61 @@ export default class RestaurantMenuAdd extends Component {
             console.log(dishImgUrl);
         }
 
-        const dish = {
-            dishName : this.state.dishName,
-            dishDescription: this.state.dishDescription,
-            dishPrice: this.state.dishPrice,
-            dishIngredients: this.state.dishIngredients,
-            dishCategory: this.state.dishCategory,
-            dishImgUrl: dishImgUrl,
-            emailId: localStorage.getItem('emailId')
-        }
-
-        const response = await saveDish(dish);
-        if (response === 200) {
-            this.setState({
-                dishName : '',
-                dishDescription: '',
-                dishPrice: '',
-                dishIngredients: '',
-                dishCategory: '',
-                dishMessege: "Dish Successfully saved"
+        this.props.client.mutate({
+            mutation: CREATE_DISH_QUERY,
+            variables: {
+                owner_email: localStorage.getItem('emailId'),
+                dish_name: this.state.dishName,
+                dish_description: this.state.dishDescription,
+                dish_price: this.state.dishPrice,
+                dish_ingredients: this.state.dishIngredients,
+                dish_category: this.state.dishCategory,
+                dish_img: dishImgUrl
+            }
+        })
+            .then(response => {
+                console.log("inside success")
+                console.log("response in create dish ", response);
             })
-        }
-        else {
-            this.setState({
-                dishName : '',
-                dishDescription: '',
-                dishPrice: '',
-                dishIngredients: '',
-                dishCategory: '',
-                dishMessege: "Dish couldn't be saved contact administrator"
+            .catch(error => {
+                console.log("In error");
+                console.log(error);
             })
-        }
 
-        this.props.fetchDishes();
+        this.props.client.query({
+            query: GET_RESTAURANT_DISHES,
+            variables: {
+                owner_email: localStorage.getItem('emailId')
+            }
+        })
+            .then(response => {
+                console.log("inside success")
+                console.log("response in all items ", response.data);
+                if (response.data.getRestaurantDishes.length > 0) {
+                    console.log("response", response.data)
+                    this.setState({
+                        dishes: response.data.getRestaurantDishes
+                    });
+                    console.log("Dishes", this.state.getRestaurantDishes)
+                }
+            })
+            .catch(error => {
+                console.log("In error");
+                console.log(error);
+            })
     }
 
     onDishImageChange = (event) => {
         const file = event.target.files[0];
         this.setState({
-            dishImg : file
+            dishImg: file
         })
-      };
+    };
 
     render() {
         return (
             <div>
-                <form onSubmit={this.addDish} style={{marginLeft:'3%'}}>
+                <form onSubmit={this.addDish} style={{ marginLeft: '3%' }}>
                     <div className="row">
                         <div className="col-3">
                             Dish Image<input accept="image/*" type="file" className="form-control-file" placeholder="Dish Image Upload" onChange={this.onDishImageChange} required></input>
@@ -127,3 +138,5 @@ export default class RestaurantMenuAdd extends Component {
         )
     }
 }
+
+export default withApollo(RestaurantMenuAdd);

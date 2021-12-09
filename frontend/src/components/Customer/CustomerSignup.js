@@ -3,6 +3,8 @@ import '../../css/User.css';
 import { connect } from "react-redux";
 import { Redirect } from 'react-router';
 import { addCustomerUser } from "../../_actions/index";
+import { withApollo } from 'react-apollo';
+import { CREATE_USER_QUERY } from '../../mutations/mutations';
 
 class CustomerSignup extends Component {
 
@@ -12,7 +14,8 @@ class CustomerSignup extends Component {
             emailId: '',
             password: '',
             userName: '',
-            reEnterPassword: ''
+            reEnterPassword: '',
+            signupStatus : ''
         };
         this.storeUser = this.storeUser.bind(this);
         this.setPageProp = this.setPageProp.bind(this)
@@ -28,18 +31,47 @@ class CustomerSignup extends Component {
             alert("Passwords Not Matching");
             return ;
         }
-        const customerUser = {
-            userEmail: this.state.emailId,
-            userName : this.state.userName,
-            password: this.state.password,
-            restaurantOwner: 'N'
-        }
-        this.props.addCustomerUser(customerUser);
+
+        let userResponse = false;
+        this.props.client.mutate({
+            mutation: CREATE_USER_QUERY,
+            variables: {
+                user_name: this.state.userName,
+                user_emailId: this.state.emailId,
+                user_pwd: this.state.password,
+                restaurant_owner: 'N'
+            }
+        })
+            .then(response => {
+                console.log("inside success")
+                console.log("response in update profile owner ", response.data);
+                userResponse = (response.data.createUser.success === true) ? true : false;
+                console.log(userResponse);
+                console.log(userResponse);
+                if (userResponse) {
+                    this.setState({
+                        signupStatus: "SUCCESS"
+                    })
+                }
+                else {
+                    console.log("here 22");
+                    this.setState({
+                        signupStatus: "FAILURE"
+                    })
+                }
+            })
+            .catch(error => {
+                console.log("In error");
+                console.log(error);
+                this.setState({
+                    signupStatus: "FAILURE"
+                })
+            })
     }
 
     render() {
         let redirectComponent = null;
-        if(this.props.signupStatus==="SUCCESS"){
+        if(this.state.signupStatus==="SUCCESS"){
             alert('Signp is successfull. Please Login');
             redirectComponent = <Redirect to="/" />
         }
@@ -115,16 +147,5 @@ class CustomerSignup extends Component {
     }
 }
 
-const mapDispatchToProps = (dispatch) =>{
-    return {
-      addCustomerUser : customerUser => dispatch(addCustomerUser(customerUser))
-    }
-  }
 
-const mapStateToProps = state => {
-    return { 
-        signupStatus: state.userReducer.signupStatus,
-     };
-};
-
-  export default connect(mapStateToProps , mapDispatchToProps)(CustomerSignup);
+export default withApollo(CustomerSignup);

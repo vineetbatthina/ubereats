@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import { getCustomerProfileByEmailId } from '../../services/CustomerService';
 import '../../css/Generic.css';
 import { sendOrders } from '../../services/CustomerService';
 import { Link } from "react-router-dom";
-import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 
-import { updateCart } from '../../_actions/index';
+import { GET_CUSTOMER_PROFILE } from '../../queries/queries'
+import { withApollo } from '@apollo/react-hoc';
+import {GET_RESTAURANT_PROFILE_ID} from '../../queries/queries';
+import {CREATE_ORDER_QUERY} from '../../mutations/mutations';
 import CustomerNavBar from './CustomerNavBar';
-import { getRestaurantProfileByID } from '../../services/CustomerService';
 
 class Checkout extends Component {
 
@@ -37,53 +37,94 @@ class Checkout extends Component {
         const modeofPayment = document.querySelector('input[name="inlineRadioOptions"]:checked').value;
 
         const currentDate = new Date();
-        let currRestaurant = {
-            restaurantId: this.props.location.state.restaurantId
-        };
-        const resultRestaurant = await getRestaurantProfileByID(currRestaurant);
 
-        if (this.state.street !== '' && this.state.state !== '' && this.state.city !== '' && this.state.country !== '' && this.state.pincode !== '') {
-            const order = {
-                custEmailId: localStorage.getItem('emailId'),
-                restaurantId: this.props.location.state.restaurantId,
-                restaurantName : resultRestaurant.store_name,
-                dishes: JSON.stringify(this.state.dishes),
-                deliveryAddress: JSON.stringify({
-                    street: this.state.street,
-                    city: this.state.city,
-                    state: this.state.state,
-                    country: this.state.country,
-                    pincode: this.state.pincode
-                }),
-                orderTimeStamp: String(currentDate),
-                paymentMode: modeofPayment,
-                totalPrice: this.state.totalPrice,
-                message: this.state.message
+        this.props.client.query({
+            query: GET_RESTAURANT_PROFILE_ID,
+            variables: {
+                _id: this.props.location.state.restaurantId
             }
-
-            console.log(order);
-
-            let order_successful = await sendOrders(order);
-
-            if (order_successful) {
-                alert("Order Placed Successfully");
-                const cart_dishes = {
-                    restaurantId: '',
-                    dishes: []
+        }).then(response => {
+            if (this.state.street !== '' && this.state.state !== '' && this.state.city !== '' && this.state.country !== '' && this.state.pincode !== '') {
+                const order = {
+                    custEmailId: localStorage.getItem('emailId'),
+                    restaurantId: this.props.location.state.restaurantId,
+                    restaurantName: response.data.restaurantProfileById.store_name,
+                    dishes: JSON.stringify(this.state.dishes),
+                    deliveryAddress: JSON.stringify({
+                        street: this.state.street,
+                        city: this.state.city,
+                        state: this.state.state,
+                        country: this.state.country,
+                        pincode: this.state.pincode
+                    }),
+                    orderTimeStamp: String(currentDate),
+                    paymentMode: modeofPayment,
+                    totalPrice: this.state.totalPrice,
+                    message: this.state.message
                 }
-                localStorage.setItem('cart_dishes', JSON.stringify(cart_dishes));
-                this.props.updateCart(localStorage.getItem("cart_dishes"));
-                this.setState({
-                    orderSuccessfull: true
-                });
+    
+                console.log(order);
+    
+                // let order_successful = await sendOrders(order);
+    
+                // if (order_successful) {
+                //     alert("Order Placed Successfully");
+                //     const cart_dishes = {
+                //         restaurantId: '',
+                //         dishes: []
+                //     }
+                //     localStorage.setItem('cart_dishes', JSON.stringify(cart_dishes));
+                //     this.props.updateCart(localStorage.getItem("cart_dishes"));
+                //     this.setState({
+                //         orderSuccessfull: true
+                //     });
+                // }
+                // else {
+                //     alert("Constact Administrator");
+                // }
+                this.props.client.mutate({
+                    mutation: CREATE_ORDER_QUERY,
+                    variables: {
+                        cust_email_id: localStorage.getItem('emailId'),
+                        restaurant_id: this.props.location.state.restaurantId,
+                        restaurant_name: response.data.restaurantProfileById.store_name,
+                        dishes_ordered: JSON.stringify(this.state.dishes),
+                        delivery_address: JSON.stringify({
+                            street: this.state.street,
+                            city: this.state.city,
+                            state: this.state.state,
+                            country: this.state.country,
+                            pincode: this.state.pincode
+                        }),
+                        order_timestamp: String(currentDate),
+                        payment_mode: modeofPayment,
+                        order_price: this.state.totalPrice,
+                        status: 'RECEIVED',
+                        message : this.state.message
+                    }
+                }).then(response => {
+                        alert("Order Placed Successfully");
+                        const cart_dishes = {
+                            restaurantId: '',
+                            dishes: []
+                        }
+                        localStorage.setItem('cart_dishes', JSON.stringify(cart_dishes));
+                        this.setState({
+                            orderSuccessfull: true
+                        });
+                })
+                .catch(error => {
+                    console.log("In error");
+                    console.log(error);
+                    alert("Contact Administrator");
+                })
             }
             else {
-                alert("Constact Administrator");
+                alert("Enter all address fields.");
             }
-        }
-        else {
-            alert("Enter all address fields.");
-        }
+        }).catch(error => {
+            console.log("In error");
+        })  
 
     }
 
@@ -98,34 +139,63 @@ class Checkout extends Component {
         const request = {
             emailId: emailId
         }
-        const customerProfile = await getCustomerProfileByEmailId(request);
+
         const totalPrice = (parseFloat(this.props.location.state.cartPrice) + parseFloat(this.props.location.state.cartPrice * 0.1) + parseFloat(this.props.location.state.cartPrice * 0.01)).toFixed(2);
 
-        if (customerProfile) {
-            const address = JSON.parse(customerProfile.address);
-            this.setState({
-                street: (address.street) ? address.street : '',
-                city: (address.city) ? address.city : '',
-                state: (address.state) ? address.state : '',
-                country: (address.country) ? address.country : '',
-                pincode: (address.pincode) ? address.pincode : '',
-                dishes: (this.props.location.state.cartDishes) ? this.props.location.state.cartDishes : [],
-                cartPrice: (this.props.location.state.cartPrice) ? parseInt(this.props.location.state.cartPrice) : 0,
-                totalPrice: totalPrice
+        this.props.client.query({
+            query: GET_CUSTOMER_PROFILE,
+            variables: {
+                email_id: emailId
+            }
+        }).then(result => {
+            console.log("Result from backend: ", result);
+            let customerProfile = result.data.getCustomerProfile;
+            if (customerProfile) {
+
+                const address = JSON.parse(customerProfile.address);
+                this.setState({
+                    street: (address.street) ? address.street : '',
+                    city: (address.city) ? address.city : '',
+                    state: (address.state) ? address.state : '',
+                    country: (address.country) ? address.country : '',
+                    pincode: (address.pincode) ? address.pincode : '',
+                    dishes: (this.props.location.state.cartDishes) ? this.props.location.state.cartDishes : [],
+                    cartPrice: (this.props.location.state.cartPrice) ? parseInt(this.props.location.state.cartPrice) : 0,
+                    totalPrice: totalPrice
+                })
+
+            }
+            else {
+                this.setState({
+                    street: '',
+                    city: '',
+                    state: '',
+                    country: '',
+                    pincode: '',
+                    dishes: (this.props.location.state.cartDishes) ? this.props.location.state.cartDishes : [],
+                    cartPrice: (this.props.location.state.cartPrice) ? parseInt(this.props.location.state.cartPrice) : 0,
+                    totalPrice: totalPrice
+                })
+            }
+        })
+            .catch(error => {
+                console.log(error);
+                this.setState({
+                    emailId: localStorage.getItem('emailId'),
+                    phone: '',
+                    name: '',
+                    nickName: '',
+                    dob: '',
+                    street: '',
+                    city: '',
+                    state: '',
+                    country: '',
+                    pincode: '',
+                    profileImg: '',
+                    noProfileData: true
+                })
             })
-        }
-        else {
-            this.setState({
-                street: '',
-                city: '',
-                state: '',
-                country: '',
-                pincode: '',
-                dishes: (this.props.location.state.cartDishes) ? this.props.location.state.cartDishes : [],
-                cartPrice: (this.props.location.state.cartPrice) ? parseInt(this.props.location.state.cartPrice) : 0,
-                totalPrice: totalPrice
-            })
-        }
+
     }
 
     render() {
@@ -178,24 +248,19 @@ class Checkout extends Component {
                         </div>
                         <br />
                     </div>
-                    <div className="row" style={{ width: "60%"}}>
-                            <div className="col">
-                                <div>
-                                    <input type="text" className="form-control" placeholder=" Let us know if you've got any special instructions. We got you! " value={this.state.message} onChange={(e) => this.setState({ message: e.target.value })} />
-                                </div>
-                            </div>
-                            <div className="col-11">
-                                
-                            </div>
+                    <div className="row" style={{ width: "60%" }}>
+                        <div className="col-11">
+                            <input type="text" className="form-control" placeholder=" Let us know if you've got any special instructions. We got you! " value={this.state.message} onChange={(e) => this.setState({ message: e.target.value })} />
+                        </div>
+                        <div className="col">
+
+                        </div>
+                        
                     </div>
                     <div className="row">
                         <div className="row">
                             <div className="col">
-                                <h2>{this.state.restaurantName}</h2>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col">
+                            <br/>
                                 <h5>Your Dishes</h5>
                                 <table className="table">
                                     <thead>
@@ -285,10 +350,4 @@ class Checkout extends Component {
     }
 }
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        updateCart: (payload) => dispatch(updateCart(payload))
-    }
-}
-
-export default connect(null, mapDispatchToProps)(Checkout);
+export default withApollo(Checkout);

@@ -10,7 +10,6 @@ export default class RestaurantCard extends Component {
 
 
     render() {
-
         return (
             <div className="card margin_bottom" style={{ width: '20rem' }} >
                 <Link
@@ -18,6 +17,7 @@ export default class RestaurantCard extends Component {
                         pathname: this.props.pathName,
                         state: {
                             restaurantId: this.props.restaurantId,
+                            restaurantEmailId: this.props.restaurantEmailId,
                             restaurantName: this.props.restaurantName,
                             restaurantDescription: this.props.restaurantDescription,
                             restaurantLocation : this.props.restaurantLocation,

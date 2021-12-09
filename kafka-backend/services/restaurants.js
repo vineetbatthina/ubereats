@@ -129,7 +129,7 @@ async function handleGetDishes(req, callback) {
 
 async function handleGetOrdersByResId(req, callback) {
 
-    console.log('Saving a Dish');
+    console.log('Getting the Orders');
 
     let restaurantId = '';
     let existingRestaurant = await Restaurants.findOne({ owner_email: req.emailId })

@@ -5,7 +5,10 @@ import { getRestaurantsBasedonSearch } from '../../services/CustomerService';
 import RestaurantCard from "../Common/RestaurantCard";
 import { BsSearch } from "react-icons/bs";
 
-export default class CustomerRestaurantsDisplay extends Component {
+import {withApollo} from "react-apollo";
+import { GET_ALL_RESTAURANTS} from '../../queries/queries';
+
+class CustomerRestaurantsDisplay extends Component {
 
     constructor(props) {
         super(props);
@@ -26,13 +29,18 @@ export default class CustomerRestaurantsDisplay extends Component {
         localStorage.restaurantMap = JSON.stringify(Array.from(initMap));
 
         const locationRestaurants = [];
-        const restaurants = await getAllRestaurants();
-        if (restaurants) {
+
+        this.props.client.query({
+            query: GET_ALL_RESTAURANTS,
+          }).then(response => {
+            console.log("Response: ", response);
+          if (response.data.getAllRestaurants) {
+      
             const restaurantMap = new Map(JSON.parse(localStorage.restaurantMap));
             console.log(localStorage.getItem('cust_location'));
             if (localStorage.getItem('cust_location')) {
-                restaurants.forEach((restaurant) => {
-                    restaurantMap.set(restaurant._id, restaurant.store_name);
+                response.data.getAllRestaurants.forEach((restaurant) => {
+                    restaurantMap.set(restaurant._id, restaurant.store_name, restaurant.owner_email);
                     console.log(restaurant.store_location);
                     console.log(localStorage.getItem('cust_location'));
                     if (restaurant.store_location === localStorage.getItem('cust_location')) {
@@ -41,13 +49,16 @@ export default class CustomerRestaurantsDisplay extends Component {
                 })
             }
             this.setState({
-                restaurants: restaurants,
+                restaurants: response.data.getAllRestaurants,
                 locationRestaurants: locationRestaurants,
             })
 
             localStorage.restaurantMap = JSON.stringify(Array.from(restaurantMap));
             console.log(locationRestaurants);
-        }
+          }
+          }).catch(error => {
+            console.log("In error"+ error);
+          })
     }
 
     async searchByString(event) {
@@ -249,7 +260,7 @@ export default class CustomerRestaurantsDisplay extends Component {
                             locationRestaurants.map((restaurant) => {
                                 return (
                                     <div className="col-4" key={restaurant._id}>
-                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant._id} dishType ={ this.props.currFilters } pathName="/restaurantDisplayForCustomer" source="customer" />
+                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant._id}  restaurantEmailId={restaurant.owner_email} dishType ={ this.props.currFilters } pathName="/restaurantDisplayForCustomer" source="customer" />
                                     </div>
                                 )
                             })
@@ -265,7 +276,7 @@ export default class CustomerRestaurantsDisplay extends Component {
                             searchedRestaurants.map((restaurant) => {
                                 return (
                                     <div className="col-4" key={restaurant._id}>
-                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant._id} dishType ={ this.props.currFilters } pathName="/restaurantDisplayForCustomer" source="customer" />
+                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant._id} restaurantEmailId={restaurant.owner_email} dishType ={ this.props.currFilters } pathName="/restaurantDisplayForCustomer" source="customer" />
                                     </div>
                                 )
                             })
@@ -282,7 +293,7 @@ export default class CustomerRestaurantsDisplay extends Component {
                             restaurants.map((restaurant) => {
                                 return (
                                     <div className="col-4" key={restaurant._id}>
-                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant._id} dishType ={ this.props.currFilters } pathName="/restaurantDisplayForCustomer" source="customer" />
+                                        <RestaurantCard restaurantName={restaurant.store_name} restaurantLocation={restaurant.store_location} restaurantDescription={restaurant.description} restaurantImg={restaurant.restaurant_img} restaurantId={restaurant._id} restaurantEmailId={restaurant.owner_email} dishType ={ this.props.currFilters } pathName="/restaurantDisplayForCustomer" source="customer" />
                                     </div>
                                 )
                             })
@@ -295,3 +306,5 @@ export default class CustomerRestaurantsDisplay extends Component {
     }
 
 }
+
+export default withApollo(CustomerRestaurantsDisplay);

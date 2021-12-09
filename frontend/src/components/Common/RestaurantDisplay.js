@@ -7,7 +7,10 @@ import CustomerNavBar from '../Customer/CustomerNavBar';
 import 'reactjs-popup/dist/index.css';
 import LandingNavBar from '../LandingNavBar';
 
-export default class RestaurantDisplay extends Component {
+import { withApollo } from 'react-apollo';
+import {GET_RESTAURANT_DISHES} from '../../queries/queries';
+
+class RestaurantDisplay extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -36,45 +39,43 @@ export default class RestaurantDisplay extends Component {
         let currFavourites = [];
         let dishesFromBackend = [];
         let filters = [];
-        const requestFavourites = {
-            emailId: localStorage.getItem('emailId')
-        }
-        const request = {
-            restaurantId: ''
-        }
-        if (this.props.location.state.restaurantId) {
-            request.restaurantId = this.props.location.state.restaurantId;
-        }
 
-        dishesFromBackend = await getDishesbyResId(request);
-        const result = await getFavourites(requestFavourites);
-        if (result.data) {
-            currFavourites.push(...(JSON.parse(result)))
-        }
-        if (dishesFromBackend) {
-
-            if (this.props.location.state.source === "customer") {
-                let searchFilters = this.props.location.state.dishType;
-                if (searchFilters) {
-                    if (searchFilters.isVegChecked || searchFilters.isNonVegChecked) {
-                        if (searchFilters.isVegChecked) {
-                            filters.push("VEGAN");
-                        }
-                        if (searchFilters.isNonVegChecked) {
-                            filters.push("NONVEG");
-                        }
-                        dishesFromBackend = dishesFromBackend.filter((dish) => String(filters).includes(dish.dish_category));
-                    }
-                }
-
+        this.props.client.query({
+            query: GET_RESTAURANT_DISHES,
+            variables: {
+                owner_email: this.props.location.state.restaurantEmailId
             }
-
-            this.setState({
-                dishes: dishesFromBackend,
-                currFavourites: currFavourites,
-                isFavourite: currFavourites.includes(JSON.stringify(this.props.location.state.restaurantId))
-            });
-        }
+        })
+            .then(response => {
+                console.log("inside success")
+                console.log("response in all items ", response.data);
+                if (response.data.getRestaurantDishes.length > 0) {
+                    if (this.props.location.state.source === "customer") {
+                        let searchFilters = this.props.location.state.dishType;
+                        if (searchFilters) {
+                            if (searchFilters.isVegChecked || searchFilters.isNonVegChecked) {
+                                if (searchFilters.isVegChecked) {
+                                    filters.push("VEGAN");
+                                }
+                                if (searchFilters.isNonVegChecked) {
+                                    filters.push("NONVEG");
+                                }
+                                dishesFromBackend = response.data.getRestaurantDishes.filter((dish) => String(filters).includes(dish.dish_category));
+                            }
+                        }
+        
+                    }
+                    this.setState({
+                        dishes: response.data.getRestaurantDishes,
+                        currFavourites: currFavourites,
+                        isFavourite: currFavourites.includes(JSON.stringify(this.props.location.state.restaurantId))
+                    });
+                }
+            })
+            .catch(error => {
+                console.log("In error");
+                console.log(error);
+            })
     }
 
     async addFavourite() {
@@ -187,3 +188,5 @@ export default class RestaurantDisplay extends Component {
         );
     }
 }
+
+export default withApollo(RestaurantDisplay);
